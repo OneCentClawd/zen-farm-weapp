@@ -1,0 +1,15 @@
+{
+  "description": "佛系农场 - 微信小游戏",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "compileHotReLoad": true,
+    "postcss": false,
+    "minified": false,
+    "newFeature": true
+  },
+  "compileType": "game",
+  "appid": "wxb94bbd6acccec202",
+  "projectname": "zen-farm-weapp"
+}
