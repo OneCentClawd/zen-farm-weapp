@@ -13,7 +13,7 @@
 import { PlantType, HealthState, PLANT_CONFIGS } from './core/PlantTypes.js';
 import { fetchWeather } from './core/Environment.js';
 import { 
-  waterPlot, plantSeed, harvestPlot, updatePlot,
+  waterPlot, plantSeed, harvestPlot, updatePlot, updatePlotOffline,
   installShelter, removeShelter, installDehumidifier, removeDehumidifier
 } from './core/GameData.js';
 import { saveGame, loadOrCreateGame } from './core/Storage.js';
@@ -236,9 +236,65 @@ export class Game {
       }
       
       console.log(`📂 地块数: ${this.gameData.plots.length}`);
+      
+      // 离线模拟：补算离线期间的生长
+      this.simulateOfflineProgress();
     } catch (e) {
       console.error('加载存档失败:', e);
       this.gameData = this.createNewGameData();
+    }
+  }
+  
+  /**
+   * 离线模拟：补算离线期间的植物生长
+   */
+  simulateOfflineProgress() {
+    if (!this.gameData || !this.gameData.lastOnlineAt) return;
+    
+    const now = Date.now();
+    const offlineMs = now - this.gameData.lastOnlineAt;
+    const offlineHours = offlineMs / (1000 * 60 * 60);
+    
+    // 离线不足 1 小时，不模拟
+    if (offlineHours < 1) {
+      console.log(`⏰ 离线 ${offlineHours.toFixed(2)} 小时，不需要模拟`);
+      return;
+    }
+    
+    console.log(`⏰ 离线 ${offlineHours.toFixed(1)} 小时，开始模拟...`);
+    
+    // 生成模拟用的天气历史（简化：用当前天气填充）
+    // TODO: 未来可以用真实历史天气
+    const mockWeather = {
+      temperature: 22,
+      humidity: 60,
+      precipitation: 0,
+      sunlight: 0.6,
+      windSpeed: 5,
+      weatherCode: 0,
+    };
+    
+    // 按天数生成天气历史
+    const days = Math.ceil(offlineHours / 24);
+    const weatherHistory = Array(days).fill(mockWeather);
+    
+    // 对每个地块进行离线补算
+    let updated = false;
+    for (let i = 0; i < this.gameData.plots.length; i++) {
+      const plot = this.gameData.plots[i];
+      if (plot.plant) {
+        const newPlot = updatePlotOffline(plot, weatherHistory);
+        if (newPlot !== plot) {
+          this.gameData.plots[i] = newPlot;
+          updated = true;
+          console.log(`🌱 地块 ${i + 1} 离线模拟完成`);
+        }
+      }
+    }
+    
+    if (updated) {
+      saveGame(this.gameData);
+      console.log('✅ 离线模拟完成并保存');
     }
   }
   
