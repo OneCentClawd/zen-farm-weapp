@@ -1,0 +1,291 @@
+/**
+ * 植物类型定义
+ */
+
+// 植物类型枚举
+export const PlantType = {
+  CLOVER: 'clover',           // 幸运草 ★
+  SUNFLOWER: 'sunflower',     // 向日葵 ★★
+  STRAWBERRY: 'strawberry',   // 草莓 ★★★★
+  SAKURA: 'sakura',           // 樱花 ★★★★★
+};
+
+/**
+ * 健康状态
+ */
+export const HealthState = {
+  HEALTHY: 'healthy',              // 健康
+  MINOR_DAMAGE: 'minor_damage',    // 轻微受损
+  DAMAGED: 'damaged',              // 明显受损
+  SEVERE: 'severe',                // 严重衰弱
+  DEAD: 'dead',                    // 死亡
+};
+
+/**
+ * 胁迫类型
+ */
+export const StressType = {
+  HEAT: 'heat',           // 热害
+  COLD: 'cold',           // 冻害
+  DROUGHT: 'drought',     // 干旱
+  WATERLOG: 'waterlog',   // 积涝
+  LOW_LIGHT: 'low_light', // 缺光
+};
+
+/**
+ * 成长阶段配置
+ * @typedef {Object} StageConfig
+ * @property {string} id            - 阶段 ID
+ * @property {string} name          - 阶段名称
+ * @property {string} emoji         - 临时占位
+ * @property {string} [sprite]      - 美术素材路径
+ * @property {number} progress      - 触发进度 0~1
+ * @property {string} description   - 描述文字
+ * @property {string} [condition]   - 可选条件：'vernalization' 需要春化
+ */
+
+/**
+ * 成长里程碑
+ * @typedef {Object} Milestone
+ * @property {string} stageId       - 阶段 ID
+ * @property {number} date          - 时间戳
+ * @property {string} weather       - 当时天气描述
+ * @property {number} height        - 当时高度
+ * @property {string} [note]        - 可选备注
+ */
+
+/**
+ * 根系分支 - 记录每条侧根的形态
+ * @typedef {Object} RootBranch
+ * @property {number} angle         - 生长角度（弧度）
+ * @property {number} length        - 相对长度（0~1，实际长度 = rootSpread * length）
+ * @property {number} depth         - 生长深度比例（0~1，从哪个深度开始）
+ * @property {number} thickness     - 粗细（0~1）
+ * @property {number} subBranches   - 细根数量
+ * @property {number} createdAt     - 创建进度（当时的 growthProgress）
+ */
+
+/**
+ * 植物实例数据 - 每棵植物独一无二
+ * @typedef {Object} PlantData
+ * @property {string} id
+ * @property {string} type
+ * @property {number} plantedAt              - 播种时间戳
+ * 
+ * @property {string} healthState
+ * @property {number} healthValue            - 0~100
+ * 
+ * @property {number} growthProgress         - 0~1
+ * @property {string} currentStageId         - 当前阶段 ID
+ * 
+ * @property {number} height                 - 高度 cm
+ * @property {number} leafCount              - 叶片数量
+ * @property {number} rootDepth              - 根系深度 cm
+ * @property {number} rootSpread             - 根系宽度 cm
+ * @property {RootBranch[]} rootStructure    - 根系结构（持久化）
+ * @property {number} stemWidth              - 茎秆粗度 mm
+ * @property {number} tiltAngle              - 倾斜角度（度），0=笔直
+ * @property {number} tiltDirection          - 倾斜方向（0-360度，0=北，90=东）
+ * 
+ * @property {number} leafColor              - 叶色深浅（0=嫩绿，1=深绿）
+ * @property {number} wiltLevel              - 萎蔫程度（0=健康，1=完全枯萎）
+ * 
+ * @property {number} lastWateredAt
+ * @property {number} harvestCount
+ * @property {number} totalWaterReceived     - 累计浇水量 ml
+ * @property {number} totalSunlightHours     - 累计日照时长
+ * @property {number} totalRainfallReceived  - 累计雨水量 mm
+ * @property {number} totalWindExposure      - 累计风吹时长
+ * 
+ * @property {number} maxTempSeen            - 经历过的最高温
+ * @property {number} minTempSeen            - 经历过的最低温
+ * @property {number} maxWindSeen            - 经历过的最大风速
+ * @property {number} daysInShelter          - 在遮挡下的天数
+ * 
+ * @property {Object<string, number>} stressDays  - 各类胁迫累计天数
+ * @property {string[]} stressHistory        - 胁迫事件历史
+ * @property {number} vernalizationDays      - 春化累计天数
+ * @property {boolean} canBloom              - 是否可以开花
+ * 
+ * @property {boolean} hardMode              - 困难模式（无提示）
+ * 
+ * @property {Milestone[]} milestones
+ */
+
+/**
+ * 植物配置（生长条件）
+ * @typedef {Object} PlantConfig
+ * @property {string} type
+ * @property {string} name
+ * @property {string} emoji
+ * @property {number} difficulty             - 1-5
+ * 
+ * @property {StageConfig[]} stages
+ * @property {number} maxHeight              - 最大高度 cm
+ * 
+ * @property {number} tempMin                - 适宜最低温
+ * @property {number} tempMax                - 适宜最高温
+ * @property {number} tempHeatDamage         - 热害温度
+ * @property {number} tempColdDamage         - 冻害温度
+ * @property {number} tempLethalHigh         - 高温致死
+ * @property {number} tempLethalLow          - 低温致死
+ * 
+ * @property {number} moistureMin            - 最低湿度
+ * @property {number} moistureMax            - 最高湿度
+ * @property {number} moistureOptimal        - 最佳湿度
+ * 
+ * @property {number} sunlightMin            - 最低日照 0~1
+ * 
+ * @property {number} growthDays             - 成熟天数
+ * @property {number} lifespan               - 寿命（天），-1 表示多年生
+ * 
+ * @property {number} droughtTolerance       - 耐旱 0~1
+ * @property {number} waterlogTolerance      - 耐涝 0~1
+ * @property {number} heatTolerance          - 耐热 0~1
+ * @property {number} coldTolerance          - 耐寒 0~1
+ * 
+ * @property {boolean} [needsVernalization]  - 是否需要春化（樱花）
+ * @property {number} [vernalizationDays]    - 春化需要的低温天数
+ * @property {boolean} [isAnnual]            - 是否一年生（收获后死亡）
+ */
+
+/**
+ * 植物配置表
+ * @type {Object<string, PlantConfig>}
+ */
+export const PLANT_CONFIGS = {
+  [PlantType.CLOVER]: {
+    type: PlantType.CLOVER,
+    name: '幸运草',
+    emoji: '🍀',
+    difficulty: 1,
+    maxHeight: 15,
+    stages: [
+      { id: 'seed', name: '种子', emoji: '🌰', progress: 0, description: '一粒小小的种子' },
+      { id: 'sprout', name: '发芽', emoji: '🌱', progress: 0.05, description: '破土而出' },
+      { id: 'leaf', name: '展叶', emoji: '🌿', progress: 0.15, description: '长出第一片叶子' },
+      { id: 'clump', name: '成丛', emoji: '🍀', progress: 0.40, description: '叶片渐渐增多' },
+      { id: 'bloom', name: '开花', emoji: '🍀', progress: 0.70, description: '小白花悄然绽放' },
+      { id: 'lucky', name: '四叶', emoji: '☘️', progress: 1.0, description: '也许会遇到四叶草？' },
+    ],
+    tempMin: 10,
+    tempMax: 25,
+    tempHeatDamage: 30,
+    tempColdDamage: -5,
+    tempLethalHigh: 45,
+    tempLethalLow: -20,
+    moistureMin: 20,
+    moistureMax: 70,
+    moistureOptimal: 45,
+    sunlightMin: 0.2,
+    growthDays: 7,
+    lifespan: -1,  // 多年生
+    droughtTolerance: 0.8,
+    waterlogTolerance: 0.5,
+    heatTolerance: 0.6,
+    coldTolerance: 0.9,
+  },
+  
+  [PlantType.SUNFLOWER]: {
+    type: PlantType.SUNFLOWER,
+    name: '向日葵',
+    emoji: '🌻',
+    difficulty: 2,
+    maxHeight: 200,
+    stages: [
+      { id: 'seed', name: '种子', emoji: '🌰', progress: 0, description: '葵花籽静静躺着' },
+      { id: 'sprout', name: '破土', emoji: '🌱', progress: 0.03, description: '小芽钻出泥土' },
+      { id: 'seedling', name: '幼苗', emoji: '🌿', progress: 0.08, description: '两片子叶舒展开' },
+      { id: 'stem', name: '抽茎', emoji: '🌿', progress: 0.20, description: '茎秆开始长高' },
+      { id: 'bud', name: '花苞', emoji: '🌻', progress: 0.50, description: '顶端鼓起花苞' },
+      { id: 'bloom', name: '盛开', emoji: '🌻', progress: 0.70, description: '金黄花盘向阳开放' },
+      { id: 'seed_head', name: '结籽', emoji: '🌻', progress: 1.0, description: '花盘里结满葵花籽' },
+    ],
+    tempMin: 18,
+    tempMax: 30,
+    tempHeatDamage: 35,
+    tempColdDamage: 10,
+    tempLethalHigh: 45,
+    tempLethalLow: -5,
+    moistureMin: 30,
+    moistureMax: 60,
+    moistureOptimal: 45,
+    sunlightMin: 0.6,
+    growthDays: 30,
+    lifespan: 120,  // 一年生
+    droughtTolerance: 0.5,
+    waterlogTolerance: 0.4,
+    heatTolerance: 0.7,
+    coldTolerance: 0.2,
+    isAnnual: true,
+  },
+  
+  [PlantType.STRAWBERRY]: {
+    type: PlantType.STRAWBERRY,
+    name: '草莓',
+    emoji: '🍓',
+    difficulty: 4,
+    maxHeight: 30,
+    stages: [
+      { id: 'seed', name: '种子', emoji: '🌰', progress: 0, description: '细小的草莓种子' },
+      { id: 'sprout', name: '发芽', emoji: '🌱', progress: 0.03, description: '嫩芽探出头' },
+      { id: 'leaf', name: '展叶', emoji: '🌿', progress: 0.10, description: '锯齿状叶片展开' },
+      { id: 'runner', name: '匍匐茎', emoji: '🌿', progress: 0.25, description: '长出匍匐茎' },
+      { id: 'bloom', name: '开花', emoji: '🌸', progress: 0.45, description: '小白花朵朵开放' },
+      { id: 'green', name: '青果', emoji: '🫛', progress: 0.65, description: '绿色小果实长出' },
+      { id: 'ripe', name: '红果', emoji: '🍓', progress: 1.0, description: '草莓红透了！' },
+    ],
+    tempMin: 15,
+    tempMax: 25,
+    tempHeatDamage: 28,
+    tempColdDamage: -5,
+    tempLethalHigh: 38,
+    tempLethalLow: -15,
+    moistureMin: 50,
+    moistureMax: 70,
+    moistureOptimal: 60,
+    sunlightMin: 0.5,
+    growthDays: 90,
+    lifespan: 730,  // 2年
+    droughtTolerance: 0.2,
+    waterlogTolerance: 0.1,
+    heatTolerance: 0.2,
+    coldTolerance: 0.4,
+  },
+  
+  [PlantType.SAKURA]: {
+    type: PlantType.SAKURA,
+    name: '樱花',
+    emoji: '🌸',
+    difficulty: 5,
+    maxHeight: 500,
+    stages: [
+      { id: 'seed', name: '种子', emoji: '🌰', progress: 0, description: '樱桃核静待发芽' },
+      { id: 'sprout', name: '发芽', emoji: '🌱', progress: 0.02, description: '小苗破壳而出' },
+      { id: 'seedling', name: '幼苗', emoji: '🌿', progress: 0.05, description: '纤细的小苗' },
+      { id: 'woody', name: '木质化', emoji: '🪵', progress: 0.15, description: '茎秆开始木质化' },
+      { id: 'branch', name: '枝繁', emoji: '🌳', progress: 0.35, description: '枝条渐渐丰满' },
+      { id: 'bud', name: '花苞', emoji: '🌳', progress: 0.60, description: '枝头结满花苞', condition: 'vernalization' },
+      { id: 'bloom', name: '盛开', emoji: '🌸', progress: 0.80, description: '满树樱花绚烂绽放' },
+      { id: 'fall', name: '落樱', emoji: '🌸', progress: 1.0, description: '花瓣如雪飘落' },
+    ],
+    tempMin: 15,
+    tempMax: 25,
+    tempHeatDamage: 35,
+    tempColdDamage: -15,
+    tempLethalHigh: 45,
+    tempLethalLow: -25,
+    moistureMin: 30,
+    moistureMax: 60,
+    moistureOptimal: 45,
+    sunlightMin: 0.5,
+    growthDays: 365,
+    lifespan: -1,  // 多年生
+    droughtTolerance: 0.5,
+    waterlogTolerance: 0.2,
+    heatTolerance: 0.4,
+    coldTolerance: 0.8,
+    needsVernalization: true,
+    vernalizationDays: 30,
+  },
+};
