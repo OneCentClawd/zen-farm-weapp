@@ -294,11 +294,11 @@ export class ParticleEffects {
     
     emitter.startColor = { r: 120, g: 180, b: 255 };
     emitter.endColor = { r: 80, g: 160, b: 255 };
-    emitter.startAlpha = 1;
+    emitter.startAlpha = 0.8;
     
-    emitter.startSize = 24;
-    emitter.startSizeVar = 8;
-    emitter.endSize = 16;
+    emitter.startSize = 10;
+    emitter.startSizeVar = 4;
+    emitter.endSize = 6;
     
     return emitter;
   }
@@ -331,9 +331,9 @@ export class ParticleEffects {
     emitter.endColor = { r: 240, g: 250, b: 255 };
     emitter.startAlpha = 1;
     
-    emitter.startSize = 32;
-    emitter.startSizeVar = 10;
-    emitter.endSize = 20;
+    emitter.startSize = 12;
+    emitter.startSizeVar = 5;
+    emitter.endSize = 8;
     
     emitter.startSpin = 0;
     emitter.startSpinVar = 180;
@@ -521,6 +521,10 @@ export class ParticleEffects {
     this.rainEmitter.update(dt);
     this.snowEmitter.update(dt);
     this.groundSplashEmitter.update(dt);
+    
+    // 雨滴/雪花落到地面时移除
+    this.rainEmitter.particles = this.rainEmitter.particles.filter(p => p.y < this.groundY);
+    this.snowEmitter.particles = this.snowEmitter.particles.filter(p => p.y < this.groundY);
     
     // 更新一次性溅射
     for (let i = this.splashEmitters.length - 1; i >= 0; i--) {
