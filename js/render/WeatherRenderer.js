@@ -131,7 +131,7 @@ export class WeatherRenderer {
     gradient.addColorStop(1, bottomColor);
     
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, this.screenWidth, this.skyHeight);
+    ctx.fillRect(0, 0, this.screenWidth, this.screenHeight);  // 画满整个屏幕
   }
   
   /**
