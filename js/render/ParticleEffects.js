@@ -331,9 +331,9 @@ export class ParticleEffects {
     emitter.endColor = { r: 240, g: 250, b: 255 };
     emitter.startAlpha = 1;
     
-    emitter.startSize = 12;
+    emitter.startSize = 15;
     emitter.startSizeVar = 5;
-    emitter.endSize = 8;
+    emitter.endSize = 10;
     
     emitter.startSpin = 0;
     emitter.startSpinVar = 180;
