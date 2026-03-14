@@ -423,15 +423,17 @@ export class ParticleEffects {
     
     // 根据强度调整，但雪花始终要慢、飘逸
     if (intensity >= 0.8) {
-      // 暴雪：更密集，稍微快一点
-      this.snowEmitter.speed = 80;
-      this.snowEmitter.gravityY = 60;
-      this.snowEmitter.startSize = 10;
+      // 暴雪：更密集，雪花更大
+      this.snowEmitter.speed = 60;
+      this.snowEmitter.gravityY = 50;
+      this.snowEmitter.startSize = 14;
+      this.snowEmitter.startSizeVar = 6;
     } else {
       // 普通雪：慢慢飘
       this.snowEmitter.speed = 40;
       this.snowEmitter.gravityY = 30;
       this.snowEmitter.startSize = 8;
+      this.snowEmitter.startSizeVar = 4;
     }
     
     this.snowEmitter.start();
@@ -495,21 +497,21 @@ export class ParticleEffects {
   updateWindSpeed(windSpeed) {
     this.currentWindSpeed = windSpeed;
     
-    // 风速转换为水平重力分量
-    const windForce = windSpeed * 8;
+    // 风速转换为水平重力分量（调小，避免变白线）
+    const windForce = windSpeed * 2;
     
     // 风吹偏移补偿
-    const windOffset = -windForce * 3;
+    const windOffset = -windForce * 1.5;
     
     // 雨滴受风影响
     this.rainEmitter.gravityX = windForce;
     this.rainEmitter.x = this.screenWidth / 2 + windOffset;
-    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 2;
+    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce);
     
     // 雪花受风影响更大
-    this.snowEmitter.gravityX = windForce * 1.5;
-    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.5;
-    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 3;
+    this.snowEmitter.gravityX = windForce * 1.2;
+    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.2;
+    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 1.5;
   }
   
   /**
