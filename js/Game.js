@@ -502,8 +502,28 @@ export class Game {
       }
     }
     
-    // 更新粒子
+    // 更新粒子（设置遮雨棚位置）
     if (this.particleEffects) {
+      const plot = this.gameData?.plots[this.selectedPlot];
+      if (plot?.hasShelter) {
+        // 计算遮雨棚位置（和 FacilityRenderer 一致）
+        const shelterWidth = 180;
+        const centerX = this.screenWidth / 2;
+        let plantHeight = 50;
+        if (plot.plant && this.plantRenderer) {
+          plantHeight = this.plantRenderer.getPlantHeight(plot.plant);
+        }
+        const shelterTopY = Math.min(this.groundTop - plantHeight - 50, this.groundTop - 120);
+        
+        this.particleEffects.setShelter(
+          true,
+          shelterTopY,
+          centerX - shelterWidth / 2,
+          centerX + shelterWidth / 2
+        );
+      } else {
+        this.particleEffects.setShelter(false);
+      }
       this.particleEffects.update(dt);
     }
     

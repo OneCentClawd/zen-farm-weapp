@@ -253,6 +253,11 @@ export class ParticleEffects {
     // 地面 Y 坐标（Canvas 坐标系，Y 向下）
     this.groundY = screenHeight * 2 / 3;
     
+    // 遮雨棚信息
+    this.shelterY = null;  // 遮雨棚顶部 Y 坐标，null 表示没有
+    this.shelterLeft = 0;
+    this.shelterRight = 0;
+    
     // 当前风速 km/h
     this.currentWindSpeed = 0;
     
@@ -488,6 +493,23 @@ export class ParticleEffects {
   }
   
   /**
+   * 设置遮雨棚位置
+   * @param {boolean} hasShelter - 是否有遮雨棚
+   * @param {number} shelterY - 遮雨棚顶部 Y 坐标
+   * @param {number} shelterLeft - 遮雨棚左边界
+   * @param {number} shelterRight - 遮雨棚右边界
+   */
+  setShelter(hasShelter, shelterY = 0, shelterLeft = 0, shelterRight = 0) {
+    if (hasShelter) {
+      this.shelterY = shelterY;
+      this.shelterLeft = shelterLeft;
+      this.shelterRight = shelterRight;
+    } else {
+      this.shelterY = null;
+    }
+  }
+  
+  /**
    * 根据天气代码更新粒子效果
    * @param {number} weatherCode
    */
@@ -525,9 +547,26 @@ export class ParticleEffects {
     this.snowEmitter.update(dt);
     this.groundSplashEmitter.update(dt);
     
-    // 雨滴/雪花落到地面时移除
-    this.rainEmitter.particles = this.rainEmitter.particles.filter(p => p.y < this.groundY);
-    this.snowEmitter.particles = this.snowEmitter.particles.filter(p => p.y < this.groundY);
+    // 雨滴/雪花落到地面或遮雨棚时移除
+    this.rainEmitter.particles = this.rainEmitter.particles.filter(p => {
+      // 落到地面
+      if (p.y >= this.groundY) return false;
+      // 落到遮雨棚
+      if (this.shelterY !== null && p.y >= this.shelterY && 
+          p.x >= this.shelterLeft && p.x <= this.shelterRight) {
+        return false;
+      }
+      return true;
+    });
+    
+    this.snowEmitter.particles = this.snowEmitter.particles.filter(p => {
+      if (p.y >= this.groundY) return false;
+      if (this.shelterY !== null && p.y >= this.shelterY && 
+          p.x >= this.shelterLeft && p.x <= this.shelterRight) {
+        return false;
+      }
+      return true;
+    });
     
     // 更新一次性溅射
     for (let i = this.splashEmitters.length - 1; i >= 0; i--) {
