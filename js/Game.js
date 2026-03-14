@@ -368,9 +368,9 @@ export class Game {
   onTouchStart(e) {
     e.preventDefault();
     const touch = e.touches[0];
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (touch.clientX - rect.left) * (this.screenWidth / rect.width);
-    const y = (touch.clientY - rect.top) * (this.screenHeight / rect.height);
+    // 微信小游戏直接用 clientX/clientY，就是逻辑像素坐标
+    const x = touch.clientX;
+    const y = touch.clientY;
     
     this.touchStartX = x;
     this.touchStartY = y;
@@ -387,9 +387,9 @@ export class Game {
   onTouchEnd(e) {
     e.preventDefault();
     const touch = e.changedTouches[0];
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (touch.clientX - rect.left) * (this.screenWidth / rect.width);
-    const y = (touch.clientY - rect.top) * (this.screenHeight / rect.height);
+    // 微信小游戏直接用 clientX/clientY
+    const x = touch.clientX;
+    const y = touch.clientY;
     
     // 弹窗优先处理
     if (this.popupManager.isShowing()) {
@@ -418,9 +418,9 @@ export class Game {
    * 鼠标按下（调试用）
    */
   onMouseDown(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (this.screenWidth / rect.width);
-    const y = (e.clientY - rect.top) * (this.screenHeight / rect.height);
+    // 微信开发者工具模拟器直接用 clientX/clientY
+    const x = e.clientX;
+    const y = e.clientY;
     
     this.touchStartX = x;
     this.touchStartY = y;
@@ -434,9 +434,8 @@ export class Game {
    * 鼠标抬起（调试用）
    */
   onMouseUp(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (this.screenWidth / rect.width);
-    const y = (e.clientY - rect.top) * (this.screenHeight / rect.height);
+    const x = e.clientX;
+    const y = e.clientY;
     
     if (this.popupManager.isShowing()) {
       this.popupManager.handleTouchEnd();
@@ -1165,6 +1164,15 @@ export class Game {
       console.log('💨 安装除湿器');
     }
     saveGame(this.gameData);
+  }
+  
+  /**
+   * 立即保存
+   */
+  saveNow() {
+    if (this.gameData) {
+      saveGame(this.gameData);
+    }
   }
   
   /**

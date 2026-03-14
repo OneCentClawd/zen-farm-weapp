@@ -57,9 +57,13 @@ requestAnimationFrame(gameLoop);
 wx.onShow(() => {
   console.log('🌱 游戏恢复');
   lastTime = Date.now();
+  // 恢复时模拟离线进度
+  if (game.gameData) {
+    game.simulateOfflineProgress();
+  }
 });
 
 wx.onHide(() => {
-  console.log('💤 游戏暂停');
-  game.destroy();
+  console.log('💤 游戏暂停，保存存档');
+  game.saveNow();
 });
