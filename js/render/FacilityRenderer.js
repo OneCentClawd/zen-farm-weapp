@@ -55,55 +55,67 @@ export class FacilityRenderer {
     // 轻微摇晃
     const sway = Math.sin(this.animTime * 1.5) * 2;
     
-    const shelterWidth = 200;
-    const shelterHeight = 30;
-    const shelterY = groundY - plantHeight - 60;
+    const shelterWidth = 180;
+    const shelterHeight = 25;
+    
+    // 棚顶高度 = 确保比植物高至少 40px
+    const minShelterTop = groundY - plantHeight - 50;
+    const shelterTopY = Math.min(minShelterTop, groundY - 120);  // 至少离地 120px
+    
+    // 支架从地面插入土里
+    const poleBottomY = groundY + 15;  // 支架底部插入土壤
+    const poleTopY = shelterTopY + shelterHeight;  // 支架顶部连接棚顶
     
     // 支架
-    ctx.strokeStyle = 'rgba(139, 90, 43, 0.9)';
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgb(139, 90, 43)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
     
     // 左支架
+    const leftPoleX = x - shelterWidth / 2 + 25;
     ctx.beginPath();
-    ctx.moveTo(x - shelterWidth / 2 + 20, groundY - 10);
-    ctx.lineTo(x - shelterWidth / 2 + 30 + sway * 0.5, shelterY + shelterHeight);
+    ctx.moveTo(leftPoleX, poleBottomY);
+    ctx.lineTo(leftPoleX + sway * 0.3, poleTopY);
     ctx.stroke();
     
     // 右支架
+    const rightPoleX = x + shelterWidth / 2 - 25;
     ctx.beginPath();
-    ctx.moveTo(x + shelterWidth / 2 - 20, groundY - 10);
-    ctx.lineTo(x + shelterWidth / 2 - 30 + sway * 0.5, shelterY + shelterHeight);
+    ctx.moveTo(rightPoleX, poleBottomY);
+    ctx.lineTo(rightPoleX + sway * 0.3, poleTopY);
     ctx.stroke();
     
     // 棚顶（半透明塑料布效果）
-    ctx.translate(x + sway, shelterY);
+    ctx.save();
+    ctx.translate(x + sway * 0.5, shelterTopY);
     
     // 主体
-    ctx.fillStyle = 'rgba(200, 220, 255, 0.35)';
+    ctx.fillStyle = 'rgba(200, 220, 255, 0.4)';
     ctx.beginPath();
     ctx.moveTo(-shelterWidth / 2, shelterHeight);
-    ctx.quadraticCurveTo(0, -10, shelterWidth / 2, shelterHeight);
-    ctx.lineTo(shelterWidth / 2 - 10, shelterHeight + 8);
-    ctx.quadraticCurveTo(0, 0, -shelterWidth / 2 + 10, shelterHeight + 8);
+    ctx.quadraticCurveTo(0, 0, shelterWidth / 2, shelterHeight);
+    ctx.lineTo(shelterWidth / 2 - 5, shelterHeight + 5);
+    ctx.quadraticCurveTo(0, 8, -shelterWidth / 2 + 5, shelterHeight + 5);
     ctx.closePath();
     ctx.fill();
     
     // 高光
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(-shelterWidth / 2 + 20, shelterHeight - 5);
-    ctx.quadraticCurveTo(0, -5, shelterWidth / 2 - 20, shelterHeight - 5);
+    ctx.moveTo(-shelterWidth / 2 + 15, shelterHeight - 3);
+    ctx.quadraticCurveTo(0, 5, shelterWidth / 2 - 15, shelterHeight - 3);
     ctx.stroke();
     
     // 边缘
-    ctx.strokeStyle = 'rgba(100, 130, 180, 0.6)';
+    ctx.strokeStyle = 'rgba(100, 130, 180, 0.7)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(-shelterWidth / 2, shelterHeight);
-    ctx.quadraticCurveTo(0, -10, shelterWidth / 2, shelterHeight);
+    ctx.quadraticCurveTo(0, 0, shelterWidth / 2, shelterHeight);
     ctx.stroke();
     
+    ctx.restore();
     ctx.restore();
   }
   

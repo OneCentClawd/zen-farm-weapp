@@ -589,13 +589,18 @@ export class Game {
     if (this.facilityRenderer && this.gameData) {
       const plot = this.gameData.plots[this.selectedPlot];
       if (plot) {
+        // 获取植物实际高度
+        const plantHeight = plot.plant && this.plantRenderer 
+          ? this.plantRenderer.getPlantHeight(plot.plant)
+          : 50;
+        
         this.facilityRenderer.render(
           ctx,
           plot.hasShelter,
           plot.hasDehumidifier,
           this.screenWidth / 2,
           this.groundTop,
-          plot.plant ? 150 : 80
+          plantHeight
         );
       }
     }

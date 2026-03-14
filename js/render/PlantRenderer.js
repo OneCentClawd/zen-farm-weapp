@@ -1823,4 +1823,22 @@ export class PlantRenderer {
     const x = Math.sin(seed * 12.9898) * 43758.5453;
     return x - Math.floor(x);
   }
+  
+  /**
+   * 获取植物渲染高度（用于遮雨棚等设施定位）
+   * @param {Object} plant - 植物数据
+   * @returns {number} - 植物高度（像素）
+   */
+  getPlantHeight(plant) {
+    if (!plant) return 0;
+    
+    const traits = this.getPlantTraits(plant.type, plant.growthProgress);
+    const stemHeight = traits.height * 3;
+    
+    // 加上花的高度
+    const hasFlower = ['flowering', 'fruiting', 'ripe', 'withering'].includes(plant.stage);
+    const flowerHeight = hasFlower ? 30 : 0;
+    
+    return stemHeight + flowerHeight + 20;  // 额外余量
+  }
 }
