@@ -702,14 +702,16 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '等待播种', this.screenWidth / 2, y);
       }
-      y += lineHeight + this.scaled(4);
-      
-      // 智能提示
-      this.setFont(ctx, 20);
-      ctx.fillStyle = 'rgb(255, 220, 150)';
-      const tip = this.generateTip(plot);
-      this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, y, 'rgb(255, 220, 150)');
     }
+    
+    // 智能提示（始终显示，不受状态栏收起影响）
+    const tipY = this.statusBarExpanded 
+      ? this.topSafeArea + this.scaled(48) + lineHeight * 4 + this.scaled(4)
+      : this.topSafeArea + this.scaled(48);
+    this.setFont(ctx, 20);
+    ctx.fillStyle = 'rgb(255, 220, 150)';
+    const tip = this.generateTip(plot);
+    this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, tipY, 'rgb(255, 220, 150)');
     
     // 更新按钮状态
     this.updateButtonStates(plot);
