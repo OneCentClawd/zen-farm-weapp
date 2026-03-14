@@ -42,6 +42,9 @@ export class Game {
     this.screenWidth = width;
     this.screenHeight = height;
     
+    // 响应式缩放比例（以 375px 宽度为基准）
+    this.scale = width / 375;
+    
     // 游戏数据
     this.gameData = null;
     this.weather = null;
@@ -158,11 +161,11 @@ export class Game {
    * 初始化按钮
    */
   initButtons() {
-    const btnX = this.screenWidth - 80;
-    let btnY = this.topSafeArea + 100;
-    const btnGap = 45;
-    const btnW = 120;
-    const btnH = 40;
+    const btnX = this.screenWidth - this.scaled(60);
+    let btnY = this.topSafeArea + this.scaled(80);
+    const btnGap = this.scaled(38);
+    const btnW = this.scaled(100);
+    const btnH = this.scaled(35);
     
     this.buttons = [
       {
@@ -597,39 +600,42 @@ export class Game {
     const plot = this.gameData.plots[this.selectedPlot];
     if (!plot) return;
     
+    // 缩放后的行距
+    const lineHeight = this.scaled(28);
+    
     // 设置字体
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
     // 标题
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 36px sans-serif';
-    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, this.topSafeArea + 20);
+    this.setFont(ctx, 32, true);
+    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, this.topSafeArea + this.scaled(18));
     
     // 展开按钮
-    ctx.font = '24px sans-serif';
-    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + 140, this.topSafeArea + 20);
+    this.setFont(ctx, 20);
+    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + this.scaled(120), this.topSafeArea + this.scaled(18));
     
     // 地块切换按钮
     const hasMultiplePlots = this.gameData.plots.length > 1;
     this.plotSwitchBtn.visible = hasMultiplePlots;
     if (hasMultiplePlots) {
-      ctx.font = '24px sans-serif';
+      this.setFont(ctx, 20);
       ctx.textAlign = 'left';
-      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, 20, this.topSafeArea + 20);
+      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, this.scaled(15), this.topSafeArea + this.scaled(18));
       ctx.textAlign = 'center';
     }
     
     // 状态栏（展开时显示）
     if (this.statusBarExpanded) {
-      let y = this.topSafeArea + 55;
-      ctx.font = '22px sans-serif';
+      let y = this.topSafeArea + this.scaled(48);
+      this.setFont(ctx, 18);
       
       // 天气
       if (this.weather) {
         const weatherText = this.getWeatherText();
         this.drawTextWithShadow(ctx, weatherText, this.screenWidth / 2, y);
-        y += 32;
+        y += lineHeight;
       }
       
       // 土壤
@@ -640,7 +646,7 @@ export class Game {
         const bar = this.getMoistureBar(plot.soilMoisture);
         this.drawTextWithShadow(ctx, `💧 土壤: ${bar} ${plot.soilMoisture.toFixed(0)}%`, this.screenWidth / 2, y);
       }
-      y += 32;
+      y += lineHeight;
       
       // 阶段
       if (plot.plant) {
@@ -654,7 +660,7 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '🌱 空地', this.screenWidth / 2, y);
       }
-      y += 32;
+      y += lineHeight;
       
       // 状态
       if (plot.plant) {
@@ -668,10 +674,10 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '等待播种', this.screenWidth / 2, y);
       }
-      y += 36;
+      y += lineHeight + this.scaled(4);
       
       // 智能提示
-      ctx.font = '24px sans-serif';
+      this.setFont(ctx, 20);
       ctx.fillStyle = 'rgb(255, 220, 150)';
       const tip = this.generateTip(plot);
       this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, y, 'rgb(255, 220, 150)');
@@ -692,6 +698,21 @@ export class Game {
     ctx.fillText(text, x + 2, y + 2);
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
+  }
+  
+  /**
+   * 获取缩放后的尺寸
+   */
+  scaled(size) {
+    return Math.round(size * this.scale);
+  }
+  
+  /**
+   * 设置缩放字体
+   */
+  setFont(ctx, size, bold = false) {
+    const scaledSize = this.scaled(size);
+    ctx.font = bold ? `bold ${scaledSize}px sans-serif` : `${scaledSize}px sans-serif`;
   }
   
   /**
@@ -828,7 +849,7 @@ export class Game {
    * 渲染按钮
    */
   renderButtons(ctx) {
-    ctx.font = '28px sans-serif';
+    this.setFont(ctx, 24);
     ctx.textAlign = 'right';
     
     for (const btn of this.buttons) {
