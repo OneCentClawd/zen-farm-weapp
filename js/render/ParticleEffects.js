@@ -315,25 +315,25 @@ export class ParticleEffects {
     emitter.posVarY = 0;
     
     emitter.totalParticles = 200;
-    emitter.emissionRate = 50;
-    emitter.life = 8;
+    emitter.emissionRate = 30;
+    emitter.life = 10;
     emitter.lifeVar = 2;
     
     emitter.gravityX = 0;
-    emitter.gravityY = 60;  // 轻微重力
+    emitter.gravityY = 30;  // 轻微重力，慢慢飘
     
     emitter.speed = 40;
-    emitter.speedVar = 20;
+    emitter.speedVar = 15;
     emitter.angle = 90;
-    emitter.angleVar = 25;
+    emitter.angleVar = 20;
     
     emitter.startColor = { r: 255, g: 255, b: 255 };
     emitter.endColor = { r: 240, g: 250, b: 255 };
-    emitter.startAlpha = 1;
+    emitter.startAlpha = 0.9;
     
-    emitter.startSize = 32;
-    emitter.startSizeVar = 10;
-    emitter.endSize = 20;
+    emitter.startSize = 8;
+    emitter.startSizeVar = 4;
+    emitter.endSize = 6;
     
     emitter.startSpin = 0;
     emitter.startSpinVar = 180;
@@ -419,7 +419,21 @@ export class ParticleEffects {
    */
   startSnow(intensity = 1) {
     console.log(`❄️ 开始下雪，强度: ${intensity}`);
-    this.snowEmitter.emissionRate = 15 + intensity * 25;
+    this.snowEmitter.emissionRate = 20 + intensity * 40;
+    
+    // 根据强度调整，但雪花始终要慢、飘逸
+    if (intensity >= 0.8) {
+      // 暴雪：更密集，稍微快一点
+      this.snowEmitter.speed = 80;
+      this.snowEmitter.gravityY = 60;
+      this.snowEmitter.startSize = 10;
+    } else {
+      // 普通雪：慢慢飘
+      this.snowEmitter.speed = 40;
+      this.snowEmitter.gravityY = 30;
+      this.snowEmitter.startSize = 8;
+    }
+    
     this.snowEmitter.start();
   }
   
