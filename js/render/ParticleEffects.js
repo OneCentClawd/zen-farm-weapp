@@ -396,7 +396,9 @@ export class ParticleEffects {
    */
   stopRain() {
     this.rainEmitter.stop();
+    this.rainEmitter.particles = [];  // 清空残留粒子
     this.groundSplashEmitter.stop();
+    this.groundSplashEmitter.particles = [];
   }
   
   /**
@@ -414,6 +416,7 @@ export class ParticleEffects {
    */
   stopSnow() {
     this.snowEmitter.stop();
+    this.snowEmitter.particles = [];  // 清空残留粒子
   }
   
   /**
