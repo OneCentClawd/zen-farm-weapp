@@ -114,13 +114,15 @@ export class Game {
     if (typeof wx !== 'undefined' && wx.getMenuButtonBoundingClientRect) {
       try {
         const rect = wx.getMenuButtonBoundingClientRect();
-        const sysInfo = wx.getSystemInfoSync();
-        return rect.bottom - sysInfo.statusBarHeight + 10;
+        // 胶囊按钮底部 + 10px 间距
+        const safeArea = rect.bottom + 10;
+        console.log(`📱 胶囊按钮底部: ${rect.bottom}, 安全区: ${safeArea}`);
+        return safeArea;
       } catch (e) {
         console.warn('获取安全区失败:', e);
       }
     }
-    return 0;
+    return 40;  // 默认值
   }
   
   /**
@@ -157,7 +159,7 @@ export class Game {
    */
   initButtons() {
     const btnX = this.screenWidth - 80;
-    let btnY = 180 + this.topSafeArea;
+    let btnY = this.topSafeArea + 100;
     const btnGap = 45;
     const btnW = 120;
     const btnH = 40;
@@ -602,11 +604,11 @@ export class Game {
     // 标题
     ctx.fillStyle = 'white';
     ctx.font = 'bold 36px sans-serif';
-    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, 50 + this.topSafeArea);
+    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, this.topSafeArea + 20);
     
     // 展开按钮
     ctx.font = '24px sans-serif';
-    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + 140, 50 + this.topSafeArea);
+    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + 140, this.topSafeArea + 20);
     
     // 地块切换按钮
     const hasMultiplePlots = this.gameData.plots.length > 1;
@@ -614,13 +616,13 @@ export class Game {
     if (hasMultiplePlots) {
       ctx.font = '24px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, 20, 50 + this.topSafeArea);
+      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, 20, this.topSafeArea + 20);
       ctx.textAlign = 'center';
     }
     
     // 状态栏（展开时显示）
     if (this.statusBarExpanded) {
-      let y = 90 + this.topSafeArea;
+      let y = this.topSafeArea + 55;
       ctx.font = '22px sans-serif';
       
       // 天气
