@@ -23,6 +23,7 @@ import { PlantRenderer } from './render/PlantRenderer.js';
 import { WeatherRenderer } from './render/WeatherRenderer.js';
 import { SoilRenderer } from './render/SoilRenderer.js';
 import { ParticleEffects } from './render/ParticleEffects.js';
+import { FacilityRenderer } from './render/FacilityRenderer.js';
 
 /**
  * 主游戏类
@@ -147,6 +148,9 @@ export class Game {
     
     // 植物渲染器
     this.plantRenderer = new PlantRenderer();
+    
+    // 设施渲染器
+    this.facilityRenderer = new FacilityRenderer();
     
     // 粒子效果
     this.particleEffects = new ParticleEffects(this.screenWidth, this.screenHeight);
@@ -503,6 +507,11 @@ export class Game {
       this.particleEffects.update(dt);
     }
     
+    // 更新设施动画
+    if (this.facilityRenderer) {
+      this.facilityRenderer.update(dt);
+    }
+    
     // 更新弹窗动画
     if (this.popupManager) {
       this.popupManager.update(dt);
@@ -573,6 +582,21 @@ export class Game {
       const plot = this.gameData.plots[this.selectedPlot];
       if (plot?.plant) {
         this.plantRenderer.render(ctx, plot.plant, this.screenWidth / 2, this.groundTop, 0);
+      }
+    }
+    
+    // 渲染设施（遮雨棚、除湿器）
+    if (this.facilityRenderer && this.gameData) {
+      const plot = this.gameData.plots[this.selectedPlot];
+      if (plot) {
+        this.facilityRenderer.render(
+          ctx,
+          plot.hasShelter,
+          plot.hasDehumidifier,
+          this.screenWidth / 2,
+          this.groundTop,
+          plot.plant ? 150 : 80
+        );
       }
     }
     
