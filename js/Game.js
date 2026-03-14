@@ -866,11 +866,8 @@ export class Game {
       harvestBtn.visible = false;
     }
     
-    // 设施按钮
-    const facilities = [];
-    if (plot.hasShelter) facilities.push('🏠遮雨');
-    if (plot.hasDehumidifier) facilities.push('💨除湿');
-    facilityBtn.text = facilities.length > 0 ? `设施: ${facilities.join(' ')}` : '🏠 设施';
+    // 设施按钮（不再显示状态文字，有动画了）
+    facilityBtn.text = '🏠 设施';
   }
   
   /**
