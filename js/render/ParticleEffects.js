@@ -599,6 +599,11 @@ export class ParticleEffects {
     // 遮雨棚飞溅只在有遮雨棚时更新
     if (this.shelterY !== null) {
       this.shelterSplashEmitter.update(dt);
+      
+      // 过滤掉遮雨棚下方的地面飞溅粒子
+      this.groundSplashEmitter.particles = this.groundSplashEmitter.particles.filter(p => {
+        return p.x < this.shelterLeft || p.x > this.shelterRight;
+      });
     } else {
       // 没有遮雨棚时清空遮雨棚飞溅粒子
       this.shelterSplashEmitter.particles = [];
