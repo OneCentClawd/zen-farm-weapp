@@ -125,9 +125,10 @@ export class FacilityRenderer {
   renderDehumidifier(ctx, x, groundY) {
     ctx.save();
     
-    const dehumX = x + 120;
-    const dehumY = groundY - 50;
-    const size = 40;
+    const dehumX = x + 100;
+    const size = 35;
+    // 除湿器底部落在地面上
+    const dehumY = groundY - size * 0.4;
     
     ctx.translate(dehumX, dehumY);
     
