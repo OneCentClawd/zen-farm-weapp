@@ -22,10 +22,8 @@ ctx.scale(pixelRatio, pixelRatio);
 
 console.log(`📱 屏幕: ${windowWidth}x${windowHeight}, 像素比: ${pixelRatio}`);
 
-// 创建游戏实例
-const game = new Game(canvas);
-game.screenWidth = windowWidth;
-game.screenHeight = windowHeight;
+// 创建游戏实例（传入逻辑尺寸和已缩放的 ctx）
+const game = new Game(canvas, ctx, windowWidth, windowHeight);
 
 // 初始化游戏
 game.init().then(() => {

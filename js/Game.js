@@ -31,13 +31,16 @@ export class Game {
   
   /**
    * @param {HTMLCanvasElement} canvas
+   * @param {CanvasRenderingContext2D} ctx - 已缩放的上下文
+   * @param {number} width - 逻辑宽度
+   * @param {number} height - 逻辑高度
    */
-  constructor(canvas) {
+  constructor(canvas, ctx, width, height) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
+    this.ctx = ctx;  // 使用传入的已缩放上下文
     
-    this.screenWidth = canvas.width;
-    this.screenHeight = canvas.height;
+    this.screenWidth = width;
+    this.screenHeight = height;
     
     // 游戏数据
     this.gameData = null;
@@ -617,14 +620,14 @@ export class Game {
     
     // 状态栏（展开时显示）
     if (this.statusBarExpanded) {
-      let y = 110 + this.topSafeArea;
-      ctx.font = '32px sans-serif';
+      let y = 115 + this.topSafeArea;
+      ctx.font = '28px sans-serif';
       
       // 天气
       if (this.weather) {
         const weatherText = this.getWeatherText();
         this.drawTextWithShadow(ctx, weatherText, this.screenWidth / 2, y);
-        y += 35;
+        y += 40;
       }
       
       // 土壤
@@ -635,7 +638,7 @@ export class Game {
         const bar = this.getMoistureBar(plot.soilMoisture);
         this.drawTextWithShadow(ctx, `💧 土壤: ${bar} ${plot.soilMoisture.toFixed(0)}%`, this.screenWidth / 2, y);
       }
-      y += 35;
+      y += 40;
       
       // 阶段
       if (plot.plant) {
@@ -649,7 +652,7 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '🌱 空地', this.screenWidth / 2, y);
       }
-      y += 35;
+      y += 40;
       
       // 状态
       if (plot.plant) {
@@ -663,10 +666,10 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '等待播种', this.screenWidth / 2, y);
       }
-      y += 40;
+      y += 45;
       
       // 智能提示
-      ctx.font = '34px sans-serif';
+      ctx.font = '30px sans-serif';
       ctx.fillStyle = 'rgb(255, 220, 150)';
       const tip = this.generateTip(plot);
       this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, y, 'rgb(255, 220, 150)');
