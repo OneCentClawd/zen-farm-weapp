@@ -219,14 +219,14 @@ export class Game {
       handler: () => this.cyclePlot(),
     };
     
-    // 展开/收起按钮
+    // 展开/收起按钮（位置和渲染一致）
     this.expandBtn = {
       id: 'expand',
       text: '▲',
-      x: 180 + this.screenWidth / 2 - 30,
-      y: 65 + this.topSafeArea - 30,
-      width: 60,
-      height: 60,
+      x: this.screenWidth / 2 + this.scaled(100),
+      y: this.topSafeArea,
+      width: this.scaled(50),
+      height: this.scaled(40),
       handler: () => this.toggleStatusBar(),
     };
   }
