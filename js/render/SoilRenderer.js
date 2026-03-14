@@ -182,32 +182,46 @@ export class SoilRenderer {
   }
   
   /**
-   * 绘制水洼
+   * 绘制水洼（积水浮在土壤顶部）
    */
   drawWaterPuddle(ctx, halfW, halfH) {
-    const puddleW = this.soilWidth * 0.35;
-    const puddleH = this.soilHeight * 0.15;
+    // 侧视角：积水在土壤最上面
+    const waterY = -halfH;  // 土壤顶部
+    const waterW = this.soilWidth * 0.9;  // 接近土壤宽度
+    const waterH = 15;  // 水层厚度
     
-    // 水洼底色
-    ctx.fillStyle = 'rgba(100, 140, 180, 0.4)';
+    // 水层主体（半透明蓝色）
+    ctx.fillStyle = 'rgba(80, 130, 180, 0.5)';
     ctx.beginPath();
-    ctx.ellipse(0, 0, puddleW, puddleH, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, waterY + waterH / 2, waterW / 2, waterH, 0, 0, Math.PI * 2);
     ctx.fill();
     
-    // 水面反光
-    ctx.fillStyle = 'rgba(200, 220, 255, 0.3)';
+    // 水面高光（顶部反光）
+    ctx.fillStyle = 'rgba(180, 210, 255, 0.4)';
     ctx.beginPath();
-    ctx.ellipse(-puddleW * 0.3, puddleH * 0.2, puddleW * 0.4, puddleH * 0.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, waterY + 3, waterW / 2 * 0.8, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 边缘高光
+    ctx.fillStyle = 'rgba(220, 240, 255, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(-waterW * 0.25, waterY + 5, waterW * 0.15, 3, 0, 0, Math.PI * 2);
     ctx.fill();
     
     // 波纹效果
-    const rippleAlpha = (50 + Math.sin(this.rippleTime * 3) * 30) / 255;
-    ctx.strokeStyle = `rgba(180, 200, 230, ${rippleAlpha})`;
+    const rippleAlpha = 0.2 + Math.sin(this.rippleTime * 3) * 0.1;
+    ctx.strokeStyle = `rgba(200, 230, 255, ${rippleAlpha})`;
     ctx.lineWidth = 1;
     
-    const rippleScale = 0.6 + Math.sin(this.rippleTime * 2) * 0.2;
+    const rippleScale = 0.5 + Math.sin(this.rippleTime * 2) * 0.15;
     ctx.beginPath();
-    ctx.ellipse(0, 0, puddleW * rippleScale, puddleH * rippleScale, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, waterY + waterH / 2, waterW / 2 * rippleScale, waterH * 0.6, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // 第二圈波纹（错开相位）
+    const rippleScale2 = 0.7 + Math.sin(this.rippleTime * 2 + 1) * 0.15;
+    ctx.beginPath();
+    ctx.ellipse(0, waterY + waterH / 2, waterW / 2 * rippleScale2, waterH * 0.5, 0, 0, Math.PI * 2);
     ctx.stroke();
   }
   
