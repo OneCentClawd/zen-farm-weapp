@@ -76,7 +76,8 @@ export class WeatherRenderer {
    */
   drawSkyGradient(ctx) {
     const hour = this.currentHour;
-    const skyY = this.screenHeight - this.skyHeight;  // 天空起始 Y
+    // 天空渐变从顶部开始，覆盖整个屏幕（UI 会画在上面）
+    const skyY = 0;
     
     let topColor, bottomColor;
     
@@ -124,13 +125,13 @@ export class WeatherRenderer {
       bottomColor = this.blendToGray(bottomColor, grayFactor);
     }
     
-    // 绘制渐变
-    const gradient = ctx.createLinearGradient(0, skyY, 0, skyY + this.skyHeight);
+    // 绘制渐变（从顶部到天空区域底部）
+    const gradient = ctx.createLinearGradient(0, 0, 0, this.skyHeight);
     gradient.addColorStop(0, topColor);
     gradient.addColorStop(1, bottomColor);
     
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, skyY, this.screenWidth, this.skyHeight);
+    ctx.fillRect(0, 0, this.screenWidth, this.skyHeight);
   }
   
   /**
@@ -139,8 +140,9 @@ export class WeatherRenderer {
   drawCelestialBodies(ctx) {
     const hour = this.currentHour;
     const halfW = this.screenWidth / 2;
-    const topY = this.screenHeight - this.skyHeight + 80;
-    const bottomY = this.screenHeight - this.skyHeight / 3;
+    // 太阳/月亮在天空区域内活动
+    const topY = 80;  // 最高点
+    const bottomY = this.skyHeight - 40;  // 最低点（地平线上方）
     
     // 太阳：6:00 升起，18:00 落下
     if (hour >= 6 && hour < 18) {
@@ -275,7 +277,8 @@ export class WeatherRenderer {
   createCloud(isRainCloud, index) {
     const size = 100 + this.seededRandom(index * 23 + 7) * 80;
     const x = this.seededRandom(index * 41 + 3) * this.screenWidth;
-    const y = this.screenHeight - this.skyHeight + 50 + this.seededRandom(index * 53 + 11) * (this.skyHeight * 0.3);
+    // 云在天空区域上半部分
+    const y = 60 + this.seededRandom(index * 53 + 11) * (this.skyHeight * 0.4);
     const scale = 0.8 + this.seededRandom(index * 67 + 19) * 0.5;
     
     return {
@@ -301,7 +304,7 @@ export class WeatherRenderer {
       if (cloud.x > this.screenWidth + cloudBuffer) {
         cloud.x = -cloudBuffer;
         const timeSeed = Math.floor(Date.now() / 1000) % 10000;
-        cloud.y = this.screenHeight - this.skyHeight + 50 + this.seededRandom(timeSeed + i * 37) * (this.skyHeight * 0.3);
+        cloud.y = 60 + this.seededRandom(timeSeed + i * 37) * (this.skyHeight * 0.4);
       }
     }
   }
