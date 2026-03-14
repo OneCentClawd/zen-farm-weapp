@@ -269,8 +269,46 @@ export class ParticleEffects {
     // 一次性溅射粒子
     this.splashEmitters = [];
     
+    // 遮雨棚飞溅发射器
+    this.shelterSplashEmitter = this.createShelterSplashEmitter();
+    
     // 上次天气代码
     this.lastWeatherCode = -1;
+  }
+  
+  /**
+   * 创建遮雨棚飞溅发射器
+   */
+  createShelterSplashEmitter() {
+    const emitter = new ParticleEmitter();
+    
+    emitter.x = this.screenWidth / 2;
+    emitter.y = 0;  // 会动态设置
+    emitter.posVarX = 90;  // 遮雨棚宽度一半
+    emitter.posVarY = 0;
+    
+    emitter.totalParticles = 60;
+    emitter.emissionRate = 0;
+    emitter.life = 0.25;
+    emitter.lifeVar = 0.1;
+    
+    emitter.gravityX = 0;
+    emitter.gravityY = 150;
+    
+    emitter.speed = 60;
+    emitter.speedVar = 30;
+    emitter.angle = -90;  // 向上
+    emitter.angleVar = 45;
+    
+    emitter.startColor = { r: 150, g: 200, b: 255 };
+    emitter.endColor = { r: 180, g: 220, b: 255 };
+    emitter.startAlpha = 0.7;
+    
+    emitter.startSize = 6;
+    emitter.startSizeVar = 3;
+    emitter.endSize = 2;
+    
+    return emitter;
   }
   
   /**
@@ -394,6 +432,10 @@ export class ParticleEffects {
     // 启动地面飞溅
     this.groundSplashEmitter.emissionRate = 30 + intensity * 50;
     this.groundSplashEmitter.start();
+    
+    // 启动遮雨棚飞溅（如果有）
+    this.shelterSplashEmitter.emissionRate = 20 + intensity * 40;
+    this.shelterSplashEmitter.start();
   }
   
   /**
@@ -404,6 +446,8 @@ export class ParticleEffects {
     this.rainEmitter.particles = [];  // 清空残留粒子
     this.groundSplashEmitter.stop();
     this.groundSplashEmitter.particles = [];
+    this.shelterSplashEmitter.stop();
+    this.shelterSplashEmitter.particles = [];
   }
   
   /**
@@ -504,6 +548,11 @@ export class ParticleEffects {
       this.shelterY = shelterY;
       this.shelterLeft = shelterLeft;
       this.shelterRight = shelterRight;
+      
+      // 更新遮雨棚飞溅位置
+      this.shelterSplashEmitter.x = (shelterLeft + shelterRight) / 2;
+      this.shelterSplashEmitter.y = shelterY;
+      this.shelterSplashEmitter.posVarX = (shelterRight - shelterLeft) / 2;
     } else {
       this.shelterY = null;
     }
@@ -546,6 +595,14 @@ export class ParticleEffects {
     this.rainEmitter.update(dt);
     this.snowEmitter.update(dt);
     this.groundSplashEmitter.update(dt);
+    
+    // 遮雨棚飞溅只在有遮雨棚时更新
+    if (this.shelterY !== null) {
+      this.shelterSplashEmitter.update(dt);
+    } else {
+      // 没有遮雨棚时清空遮雨棚飞溅粒子
+      this.shelterSplashEmitter.particles = [];
+    }
     
     // 雨滴/雪花落到地面或遮雨棚时移除
     this.rainEmitter.particles = this.rainEmitter.particles.filter(p => {
@@ -593,6 +650,11 @@ export class ParticleEffects {
     
     // 渲染地面飞溅
     this.renderSplashParticles(ctx, this.groundSplashEmitter.particles);
+    
+    // 渲染遮雨棚飞溅
+    if (this.shelterY !== null) {
+      this.renderSplashParticles(ctx, this.shelterSplashEmitter.particles);
+    }
     
     // 渲染浇水溅射
     for (const emitter of this.splashEmitters) {
