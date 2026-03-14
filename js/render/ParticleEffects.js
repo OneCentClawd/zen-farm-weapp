@@ -279,26 +279,26 @@ export class ParticleEffects {
     emitter.posVarX = this.screenWidth / 2;
     emitter.posVarY = 0;
     
-    emitter.totalParticles = 250;
-    emitter.emissionRate = 120;
-    emitter.life = 2.5;
-    emitter.lifeVar = 0.5;
+    emitter.totalParticles = 300;
+    emitter.emissionRate = 150;
+    emitter.life = 1.5;
+    emitter.lifeVar = 0.3;
     
     emitter.gravityX = 0;
-    emitter.gravityY = 800;  // 向下（Canvas Y 向下为正）
+    emitter.gravityY = 1200;  // 更快下落
     
-    emitter.speed = 400;
-    emitter.speedVar = 100;
+    emitter.speed = 600;
+    emitter.speedVar = 150;
     emitter.angle = 90;  // 向下
-    emitter.angleVar = 5;
+    emitter.angleVar = 3;
     
-    emitter.startColor = { r: 120, g: 180, b: 255 };
-    emitter.endColor = { r: 80, g: 160, b: 255 };
-    emitter.startAlpha = 1;
+    emitter.startColor = { r: 150, g: 200, b: 255 };
+    emitter.endColor = { r: 100, g: 180, b: 255 };
+    emitter.startAlpha = 0.8;
     
-    emitter.startSize = 24;
-    emitter.startSizeVar = 8;
-    emitter.endSize = 16;
+    emitter.startSize = 8;   // 小一点
+    emitter.startSizeVar = 3;
+    emitter.endSize = 4;
     
     return emitter;
   }
@@ -521,6 +521,12 @@ export class ParticleEffects {
     this.rainEmitter.update(dt);
     this.snowEmitter.update(dt);
     this.groundSplashEmitter.update(dt);
+    
+    // 雨滴落到地面时移除
+    this.rainEmitter.particles = this.rainEmitter.particles.filter(p => p.y < this.groundY);
+    
+    // 雪花落到地面时移除
+    this.snowEmitter.particles = this.snowEmitter.particles.filter(p => p.y < this.groundY);
     
     // 更新一次性溅射
     for (let i = this.splashEmitters.length - 1; i >= 0; i--) {
