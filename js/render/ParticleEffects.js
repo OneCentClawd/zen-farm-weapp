@@ -497,21 +497,21 @@ export class ParticleEffects {
   updateWindSpeed(windSpeed) {
     this.currentWindSpeed = windSpeed;
     
-    // 风速转换为水平重力分量（调小，避免变白线）
-    const windForce = windSpeed * 2;
+    // 风速转换为水平重力分量
+    const windForce = windSpeed * 6;
     
     // 风吹偏移补偿
-    const windOffset = -windForce * 1.5;
+    const windOffset = -windForce * 2;
     
     // 雨滴受风影响
     this.rainEmitter.gravityX = windForce;
     this.rainEmitter.x = this.screenWidth / 2 + windOffset;
-    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce);
+    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 1.5;
     
     // 雪花受风影响更大
-    this.snowEmitter.gravityX = windForce * 1.2;
-    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.2;
-    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 1.5;
+    this.snowEmitter.gravityX = windForce * 1.3;
+    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.3;
+    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 2;
   }
   
   /**
@@ -601,18 +601,21 @@ export class ParticleEffects {
       const color = p.getCurrentColor();
       const alpha = p.getCurrentAlpha();
       
-      // 雨滴形状：拉长的椭圆/线条
       ctx.save();
       ctx.translate(p.x, p.y);
       
-      // 根据速度方向旋转
-      const angle = Math.atan2(p.vy, p.vx);
-      ctx.rotate(angle - Math.PI / 2);
+      // 根据速度方向旋转，但限制最大倾斜角度（避免变白线）
+      let angle = Math.atan2(p.vy, p.vx);
+      // 限制在 ±30° 以内
+      const maxTilt = Math.PI / 6;
+      const tilt = angle - Math.PI / 2;
+      const clampedTilt = Math.max(-maxTilt, Math.min(maxTilt, tilt));
+      ctx.rotate(clampedTilt);
       
-      // 绘制雨滴（拉长的椭圆）
+      // 绘制雨滴（椭圆形，不要太长）
       ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
       ctx.beginPath();
-      ctx.ellipse(0, 0, size * 0.3, size, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, size * 0.4, size * 0.8, 0, 0, Math.PI * 2);
       ctx.fill();
       
       ctx.restore();
