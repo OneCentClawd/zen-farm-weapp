@@ -156,11 +156,11 @@ export class Game {
    * 初始化按钮
    */
   initButtons() {
-    const btnX = this.screenWidth - 120;
-    let btnY = 250 + this.topSafeArea;
-    const btnGap = 55;
-    const btnW = 150;
-    const btnH = 50;
+    const btnX = this.screenWidth - 80;
+    let btnY = 180 + this.topSafeArea;
+    const btnGap = 45;
+    const btnW = 120;
+    const btnH = 40;
     
     this.buttons = [
       {
@@ -601,33 +601,33 @@ export class Game {
     
     // 标题
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 48px sans-serif';
-    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, 65 + this.topSafeArea);
+    ctx.font = 'bold 36px sans-serif';
+    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, 50 + this.topSafeArea);
     
     // 展开按钮
-    ctx.font = '32px sans-serif';
-    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + 180, 65 + this.topSafeArea);
+    ctx.font = '24px sans-serif';
+    ctx.fillText(this.statusBarExpanded ? '▲' : '▼', this.screenWidth / 2 + 140, 50 + this.topSafeArea);
     
     // 地块切换按钮
     const hasMultiplePlots = this.gameData.plots.length > 1;
     this.plotSwitchBtn.visible = hasMultiplePlots;
     if (hasMultiplePlots) {
-      ctx.font = '36px sans-serif';
+      ctx.font = '24px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, 30, 65 + this.topSafeArea);
+      ctx.fillText(`◀ ${this.selectedPlot + 1}/${this.gameData.plots.length} ▶`, 20, 50 + this.topSafeArea);
       ctx.textAlign = 'center';
     }
     
     // 状态栏（展开时显示）
     if (this.statusBarExpanded) {
-      let y = 115 + this.topSafeArea;
-      ctx.font = '28px sans-serif';
+      let y = 90 + this.topSafeArea;
+      ctx.font = '22px sans-serif';
       
       // 天气
       if (this.weather) {
         const weatherText = this.getWeatherText();
         this.drawTextWithShadow(ctx, weatherText, this.screenWidth / 2, y);
-        y += 40;
+        y += 32;
       }
       
       // 土壤
@@ -638,7 +638,7 @@ export class Game {
         const bar = this.getMoistureBar(plot.soilMoisture);
         this.drawTextWithShadow(ctx, `💧 土壤: ${bar} ${plot.soilMoisture.toFixed(0)}%`, this.screenWidth / 2, y);
       }
-      y += 40;
+      y += 32;
       
       // 阶段
       if (plot.plant) {
@@ -652,7 +652,7 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '🌱 空地', this.screenWidth / 2, y);
       }
-      y += 40;
+      y += 32;
       
       // 状态
       if (plot.plant) {
@@ -666,10 +666,10 @@ export class Game {
       } else {
         this.drawTextWithShadow(ctx, '等待播种', this.screenWidth / 2, y);
       }
-      y += 45;
+      y += 36;
       
       // 智能提示
-      ctx.font = '30px sans-serif';
+      ctx.font = '24px sans-serif';
       ctx.fillStyle = 'rgb(255, 220, 150)';
       const tip = this.generateTip(plot);
       this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, y, 'rgb(255, 220, 150)');
@@ -826,7 +826,7 @@ export class Game {
    * 渲染按钮
    */
   renderButtons(ctx) {
-    ctx.font = '40px sans-serif';
+    ctx.font = '28px sans-serif';
     ctx.textAlign = 'right';
     
     for (const btn of this.buttons) {
