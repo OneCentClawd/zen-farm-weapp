@@ -279,26 +279,26 @@ export class ParticleEffects {
     emitter.posVarX = this.screenWidth / 2;
     emitter.posVarY = 0;
     
-    emitter.totalParticles = 300;
-    emitter.emissionRate = 150;
-    emitter.life = 1.5;
-    emitter.lifeVar = 0.3;
+    emitter.totalParticles = 250;
+    emitter.emissionRate = 120;
+    emitter.life = 2.5;
+    emitter.lifeVar = 0.5;
     
     emitter.gravityX = 0;
-    emitter.gravityY = 1200;  // 更快下落
+    emitter.gravityY = 800;  // 向下（Canvas Y 向下为正）
     
-    emitter.speed = 600;
-    emitter.speedVar = 150;
+    emitter.speed = 400;
+    emitter.speedVar = 100;
     emitter.angle = 90;  // 向下
-    emitter.angleVar = 3;
+    emitter.angleVar = 5;
     
-    emitter.startColor = { r: 150, g: 200, b: 255 };
-    emitter.endColor = { r: 100, g: 180, b: 255 };
-    emitter.startAlpha = 0.8;
+    emitter.startColor = { r: 120, g: 180, b: 255 };
+    emitter.endColor = { r: 80, g: 160, b: 255 };
+    emitter.startAlpha = 1;
     
-    emitter.startSize = 8;   // 小一点
-    emitter.startSizeVar = 3;
-    emitter.endSize = 4;
+    emitter.startSize = 24;
+    emitter.startSizeVar = 8;
+    emitter.endSize = 16;
     
     return emitter;
   }
@@ -315,25 +315,25 @@ export class ParticleEffects {
     emitter.posVarY = 0;
     
     emitter.totalParticles = 200;
-    emitter.emissionRate = 30;
-    emitter.life = 10;
+    emitter.emissionRate = 50;
+    emitter.life = 8;
     emitter.lifeVar = 2;
     
     emitter.gravityX = 0;
-    emitter.gravityY = 30;  // 轻微重力，慢慢飘
+    emitter.gravityY = 60;  // 轻微重力
     
     emitter.speed = 40;
-    emitter.speedVar = 15;
+    emitter.speedVar = 20;
     emitter.angle = 90;
-    emitter.angleVar = 20;
+    emitter.angleVar = 25;
     
     emitter.startColor = { r: 255, g: 255, b: 255 };
     emitter.endColor = { r: 240, g: 250, b: 255 };
-    emitter.startAlpha = 0.9;
+    emitter.startAlpha = 1;
     
-    emitter.startSize = 8;
-    emitter.startSizeVar = 4;
-    emitter.endSize = 6;
+    emitter.startSize = 32;
+    emitter.startSizeVar = 10;
+    emitter.endSize = 20;
     
     emitter.startSpin = 0;
     emitter.startSpinVar = 180;
@@ -383,21 +383,7 @@ export class ParticleEffects {
    */
   startRain(intensity = 1) {
     console.log(`🌧️ 开始下雨，强度: ${intensity}`);
-    this.rainEmitter.emissionRate = 40 + intensity * 110;
-    
-    // 根据强度调整速度和大小
-    if (intensity >= 0.8) {
-      // 暴雨：快速、密集
-      this.rainEmitter.speed = 600;
-      this.rainEmitter.gravityY = 1200;
-      this.rainEmitter.startSize = 10;
-    } else {
-      // 普通雨：慢一点、柔和
-      this.rainEmitter.speed = 300;
-      this.rainEmitter.gravityY = 600;
-      this.rainEmitter.startSize = 6;
-    }
-    
+    this.rainEmitter.emissionRate = 40 + intensity * 80;
     this.rainEmitter.start();
     
     // 启动地面飞溅
@@ -419,23 +405,7 @@ export class ParticleEffects {
    */
   startSnow(intensity = 1) {
     console.log(`❄️ 开始下雪，强度: ${intensity}`);
-    this.snowEmitter.emissionRate = 20 + intensity * 40;
-    
-    // 根据强度调整，但雪花始终要慢、飘逸
-    if (intensity >= 0.8) {
-      // 暴雪：更密集，雪花更大
-      this.snowEmitter.speed = 60;
-      this.snowEmitter.gravityY = 50;
-      this.snowEmitter.startSize = 14;
-      this.snowEmitter.startSizeVar = 6;
-    } else {
-      // 普通雪：慢慢飘
-      this.snowEmitter.speed = 40;
-      this.snowEmitter.gravityY = 30;
-      this.snowEmitter.startSize = 8;
-      this.snowEmitter.startSizeVar = 4;
-    }
-    
+    this.snowEmitter.emissionRate = 15 + intensity * 25;
     this.snowEmitter.start();
   }
   
@@ -498,20 +468,20 @@ export class ParticleEffects {
     this.currentWindSpeed = windSpeed;
     
     // 风速转换为水平重力分量
-    const windForce = windSpeed * 6;
+    const windForce = windSpeed * 8;
     
     // 风吹偏移补偿
-    const windOffset = -windForce * 2;
+    const windOffset = -windForce * 3;
     
     // 雨滴受风影响
     this.rainEmitter.gravityX = windForce;
     this.rainEmitter.x = this.screenWidth / 2 + windOffset;
-    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 1.5;
+    this.rainEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 2;
     
     // 雪花受风影响更大
-    this.snowEmitter.gravityX = windForce * 1.3;
-    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.3;
-    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 2;
+    this.snowEmitter.gravityX = windForce * 1.5;
+    this.snowEmitter.x = this.screenWidth / 2 + windOffset * 1.5;
+    this.snowEmitter.posVarX = this.screenWidth / 2 + Math.abs(windForce) * 3;
   }
   
   /**
@@ -551,12 +521,6 @@ export class ParticleEffects {
     this.rainEmitter.update(dt);
     this.snowEmitter.update(dt);
     this.groundSplashEmitter.update(dt);
-    
-    // 雨滴落到地面时移除
-    this.rainEmitter.particles = this.rainEmitter.particles.filter(p => p.y < this.groundY);
-    
-    // 雪花落到地面时移除
-    this.snowEmitter.particles = this.snowEmitter.particles.filter(p => p.y < this.groundY);
     
     // 更新一次性溅射
     for (let i = this.splashEmitters.length - 1; i >= 0; i--) {
@@ -601,21 +565,18 @@ export class ParticleEffects {
       const color = p.getCurrentColor();
       const alpha = p.getCurrentAlpha();
       
+      // 雨滴形状：拉长的椭圆/线条
       ctx.save();
       ctx.translate(p.x, p.y);
       
-      // 根据速度方向旋转，但限制最大倾斜角度（避免变白线）
-      let angle = Math.atan2(p.vy, p.vx);
-      // 限制在 ±30° 以内
-      const maxTilt = Math.PI / 6;
-      const tilt = angle - Math.PI / 2;
-      const clampedTilt = Math.max(-maxTilt, Math.min(maxTilt, tilt));
-      ctx.rotate(clampedTilt);
+      // 根据速度方向旋转
+      const angle = Math.atan2(p.vy, p.vx);
+      ctx.rotate(angle - Math.PI / 2);
       
-      // 绘制雨滴（椭圆形，不要太长）
+      // 绘制雨滴（拉长的椭圆）
       ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
       ctx.beginPath();
-      ctx.ellipse(0, 0, size * 0.4, size * 0.8, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, size * 0.3, size, 0, 0, Math.PI * 2);
       ctx.fill();
       
       ctx.restore();
