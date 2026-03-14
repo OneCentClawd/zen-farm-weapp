@@ -20,7 +20,7 @@ export class FacilityRenderer {
    */
   update(dt) {
     this.animTime += dt;
-    this.fanAngle += dt * 8;  // 风扇转速
+    this.fanAngle += dt * 15;  // 风扇转速
     
     // 更新气流粒子
     this.updateAirParticles(dt);
