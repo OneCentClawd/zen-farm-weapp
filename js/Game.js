@@ -51,10 +51,6 @@ export class Game {
     this.weather = null;
     this.selectedPlot = 0;
     
-    // 测试天气模式
-    this.testWeatherIndex = -1;  // -1 = 真实天气
-    this.testWeathers = ['sunny', 'cloudy', 'rain', 'heavyRain', 'snow', 'heavySnow'];
-    
     // 渲染器
     this.weatherRenderer = null;
     this.soilRenderer = null;
@@ -212,15 +208,6 @@ export class Game {
         height: btnH,
         visible: false,
         handler: () => this.onHarvestTap(),
-      },
-      {
-        id: 'testWeather',
-        text: '🧪 测试天气',
-        x: btnX - btnW / 2,
-        y: btnY + btnGap * 4 - btnH / 2,
-        width: btnW,
-        height: btnH,
-        handler: () => this.cycleTestWeather(),
       },
     ];
     
@@ -1216,62 +1203,6 @@ export class Game {
   saveNow() {
     if (this.gameData) {
       saveGame(this.gameData);
-    }
-  }
-  
-  /**
-   * 循环切换测试天气
-   */
-  cycleTestWeather() {
-    this.testWeatherIndex++;
-    if (this.testWeatherIndex >= this.testWeathers.length) {
-      this.testWeatherIndex = -1;  // 回到真实天气
-    }
-    
-    if (this.testWeatherIndex === -1) {
-      console.log('🌤️ 切换到真实天气');
-      // 恢复真实天气
-      if (this.weather && this.particleEffects) {
-        this.particleEffects.updateWeatherEffect(this.weather.weatherCode);
-      }
-    } else {
-      const weatherType = this.testWeathers[this.testWeatherIndex];
-      console.log(`🧪 测试天气: ${weatherType}`);
-      
-      // 设置测试天气效果
-      const weatherCodes = {
-        sunny: 0,      // 晴天
-        cloudy: 3,     // 多云
-        rain: 61,      // 小雨
-        heavyRain: 65, // 大雨
-        snow: 71,      // 小雪
-        heavySnow: 75, // 大雪
-      };
-      
-      if (this.particleEffects) {
-        this.particleEffects.updateWeatherEffect(weatherCodes[weatherType]);
-      }
-      if (this.weatherRenderer) {
-        // 临时修改天气数据来改变天色
-        const testWeather = {
-          ...this.weather,
-          weatherCode: weatherCodes[weatherType],
-          precipitation: weatherType.includes('Rain') ? 10 : (weatherType.includes('Snow') ? 5 : 0),
-          sunlight: weatherType === 'sunny' ? 0.9 : (weatherType === 'cloudy' ? 0.5 : 0.2),
-        };
-        this.weatherRenderer.updateWeather(testWeather);
-      }
-    }
-    
-    // 更新按钮文字
-    const btn = this.buttons.find(b => b.id === 'testWeather');
-    if (btn) {
-      if (this.testWeatherIndex === -1) {
-        btn.text = '🧪 测试天气';
-      } else {
-        const names = ['☀️晴', '☁️云', '🌧️雨', '⛈️暴雨', '🌨️雪', '❄️暴雪'];
-        btn.text = `🧪 ${names[this.testWeatherIndex]}`;
-      }
     }
   }
   
