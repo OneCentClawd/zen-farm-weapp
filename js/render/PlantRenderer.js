@@ -1832,10 +1832,14 @@ export class PlantRenderer {
   getPlantHeight(plant) {
     if (!plant) return 0;
     
-    const traits = this.getPlantTraits(plant.type, plant.growthProgress);
-    const stemHeight = traits.height * 3;
+    // 根据生长阶段估算高度
+    const baseHeight = 80;  // 基础高度
+    const progress = plant.growthProgress || 0;
     
-    // 加上花的高度
+    // 进度越高植物越高
+    const stemHeight = baseHeight + progress * 100;
+    
+    // 开花/结果阶段额外高度
     const hasFlower = ['flowering', 'fruiting', 'ripe', 'withering'].includes(plant.stage);
     const flowerHeight = hasFlower ? 30 : 0;
     
