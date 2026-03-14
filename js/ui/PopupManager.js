@@ -19,7 +19,7 @@ export class PopupManager {
     
     // 默认配置
     this.defaultConfig = {
-      width: 0.6,    // 0-1 表示屏幕比例
+      width: 0.85,   // 0-1 表示屏幕比例（加宽）
       height: 0.35,
       closeOnMask: true,
     };
