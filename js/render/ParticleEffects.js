@@ -383,7 +383,21 @@ export class ParticleEffects {
    */
   startRain(intensity = 1) {
     console.log(`🌧️ 开始下雨，强度: ${intensity}`);
-    this.rainEmitter.emissionRate = 40 + intensity * 80;
+    this.rainEmitter.emissionRate = 40 + intensity * 110;
+    
+    // 根据强度调整速度和大小
+    if (intensity >= 0.8) {
+      // 暴雨：快速、密集
+      this.rainEmitter.speed = 600;
+      this.rainEmitter.gravityY = 1200;
+      this.rainEmitter.startSize = 10;
+    } else {
+      // 普通雨：慢一点、柔和
+      this.rainEmitter.speed = 300;
+      this.rainEmitter.gravityY = 600;
+      this.rainEmitter.startSize = 6;
+    }
+    
     this.rainEmitter.start();
     
     // 启动地面飞溅
