@@ -55,9 +55,9 @@ export class PopupManager {
       this.activePopup.elements.push({
         type: 'label',
         text: cfg.title,
-        fontSize: 38,
+        fontSize: 28,
         x: panelW / 2,
-        y: 45,
+        y: 35,
         color: 'rgb(255, 255, 255)',
       });
     }
@@ -87,9 +87,9 @@ export class PopupManager {
       text,
       x: this.activePopup.panelW / 2 + x,
       y: this.activePopup.panelH / 2 - y,  // 转换坐标
-      width: 220,
-      height: 48,
-      fontSize: 32,
+      width: 180,
+      height: 40,
+      fontSize: 22,
       color: colors[style] || colors.primary,
       onClick,
       pressed: false,
@@ -114,9 +114,9 @@ export class PopupManager {
       text,
       x: this.activePopup.panelW / 2 + x,
       y: this.activePopup.panelH / 2 - y,
-      width: 240,
-      height: 52,
-      fontSize: 30,
+      width: 200,
+      height: 44,
+      fontSize: 22,
       color: 'rgb(230, 230, 230)',
       bgColor: 'rgba(60, 65, 75, 0.8)',
       onClick,
@@ -135,7 +135,7 @@ export class PopupManager {
    * @param {number} fontSize
    * @param {string} color
    */
-  addLabel(text, x, y, fontSize = 28, color = 'rgb(200, 200, 205)') {
+  addLabel(text, x, y, fontSize = 18, color = 'rgb(200, 200, 205)') {
     if (!this.activePopup) return null;
     
     const label = {
