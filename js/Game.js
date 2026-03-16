@@ -24,6 +24,7 @@ import { WeatherRenderer } from './render/WeatherRenderer.js';
 import { SoilRenderer } from './render/SoilRenderer.js';
 import { ParticleEffects } from './render/ParticleEffects.js';
 import { FacilityRenderer } from './render/FacilityRenderer.js';
+import { IconRenderer } from './render/IconRenderer.js';
 
 /**
  * 主游戏类
@@ -174,7 +175,8 @@ export class Game {
     this.buttons = [
       {
         id: 'action',
-        text: '🌱 种植',
+        text: '种植',
+        icon: 'seedling',
         x: btnX - btnW / 2,
         y: btnY - btnH / 2,
         width: btnW,
@@ -183,7 +185,8 @@ export class Game {
       },
       {
         id: 'water',
-        text: '💧 浇水',
+        text: '浇水',
+        icon: 'raindrop',
         x: btnX - btnW / 2,
         y: btnY + btnGap - btnH / 2,
         width: btnW,
@@ -192,7 +195,8 @@ export class Game {
       },
       {
         id: 'facility',
-        text: '🏠 设施',
+        text: '设施',
+        icon: 'house',
         x: btnX - btnW / 2,
         y: btnY + btnGap * 2 - btnH / 2,
         width: btnW,
@@ -201,7 +205,8 @@ export class Game {
       },
       {
         id: 'harvest',
-        text: '🌾 收获',
+        text: '收获',
+        icon: 'wheat',
         x: btnX - btnW / 2,
         y: btnY + btnGap * 3 - btnH / 2,
         width: btnW,
@@ -875,9 +880,11 @@ export class Game {
     
     if (plot.plant) {
       if (plot.plant.healthState === HealthState.DEAD) {
-        actionBtn.text = '🗑️ 清除';
+        actionBtn.text = '清除';
+        actionBtn.icon = 'skull';
       } else {
-        actionBtn.text = '⛏️ 挖除';
+        actionBtn.text = '挖除';
+        actionBtn.icon = 'leaf';
       }
       
       // 收获按钮
@@ -887,26 +894,94 @@ export class Game {
         harvestBtn.visible = false;
       }
     } else {
-      actionBtn.text = '🌱 种植';
+      actionBtn.text = '种植';
+      actionBtn.icon = 'seedling';
       harvestBtn.visible = false;
     }
     
     // 设施按钮（不再显示状态文字，有动画了）
-    facilityBtn.text = '🏠 设施';
+    facilityBtn.text = '设施';
+    facilityBtn.icon = 'house';
   }
   
   /**
    * 渲染按钮
    */
   renderButtons(ctx) {
-    this.setFont(ctx, 24);
-    ctx.textAlign = 'right';
+    this.setFont(ctx, 18);
+    ctx.textAlign = 'left';
     
     for (const btn of this.buttons) {
       if (btn.visible === false) continue;
       
+      const iconSize = this.scaled(22);
+      const iconX = btn.x + btn.width - this.scaled(85);
+      const iconY = btn.y + btn.height / 2;
+      
+      // 绘制图标
+      if (btn.icon) {
+        this.drawIcon(ctx, btn.icon, iconX, iconY, iconSize);
+      }
+      
+      // 绘制文字
       ctx.fillStyle = 'white';
-      ctx.fillText(btn.text, btn.x + btn.width, btn.y + btn.height / 2 + 12);
+      ctx.fillText(btn.text, iconX + iconSize / 2 + this.scaled(5), btn.y + btn.height / 2 + 6);
+    }
+  }
+  
+  /**
+   * 绘制图标
+   */
+  drawIcon(ctx, icon, x, y, size) {
+    switch (icon) {
+      case 'seedling':
+        IconRenderer.seedling(ctx, x, y, size);
+        break;
+      case 'raindrop':
+        IconRenderer.raindrop(ctx, x, y, size);
+        break;
+      case 'house':
+        IconRenderer.house(ctx, x, y, size);
+        break;
+      case 'wheat':
+        IconRenderer.wheat(ctx, x, y, size);
+        break;
+      case 'leaf':
+        IconRenderer.leaf(ctx, x, y, size);
+        break;
+      case 'sun':
+        IconRenderer.sun(ctx, x, y, size);
+        break;
+      case 'cloud':
+        IconRenderer.cloud(ctx, x, y, size);
+        break;
+      case 'snowflake':
+        IconRenderer.snowflake(ctx, x, y, size);
+        break;
+      case 'wind':
+        IconRenderer.wind(ctx, x, y, size);
+        break;
+      case 'thermometer':
+        IconRenderer.thermometer(ctx, x, y, size);
+        break;
+      case 'skull':
+        IconRenderer.skull(ctx, x, y, size);
+        break;
+      case 'fire':
+        IconRenderer.fire(ctx, x, y, size);
+        break;
+      case 'desert':
+        IconRenderer.desert(ctx, x, y, size);
+        break;
+      case 'happy':
+        IconRenderer.face(ctx, x, y, size, 'happy');
+        break;
+      case 'neutral':
+        IconRenderer.face(ctx, x, y, size, 'neutral');
+        break;
+      case 'sad':
+        IconRenderer.face(ctx, x, y, size, 'sad');
+        break;
     }
   }
   
