@@ -1290,22 +1290,23 @@ export class Game {
    */
   showPlantSelect() {
     const popup = this.popupManager.show('PlantSelect', {
-      title: '🌱 选择要种植的植物',
+      title: '选择要种植的植物',
       height: 0.6,
     });
     
     const plants = [
-      { type: PlantType.CLOVER, emoji: '🍀', name: '幸运草' },
-      { type: PlantType.SUNFLOWER, emoji: '🌻', name: '向日葵' },
-      { type: PlantType.STRAWBERRY, emoji: '🍓', name: '草莓' },
-      { type: PlantType.SAKURA, emoji: '🌸', name: '樱花' },
+      { type: PlantType.CLOVER, name: '幸运草' },
+      { type: PlantType.SUNFLOWER, name: '向日葵' },
+      { type: PlantType.STRAWBERRY, name: '草莓' },
+      { type: PlantType.SAKURA, name: '樱花' },
     ];
     
     let y = 80;
     for (const p of plants) {
       const config = PLANT_CONFIGS[p.type];
+      const stars = '★'.repeat(config.difficulty) + '☆'.repeat(5 - config.difficulty);
       this.popupManager.addButton(
-        `${p.emoji} ${p.name}  ⭐${config.difficulty}  📅${config.growthDays}天`,
+        `${p.name}  ${stars}  ${config.growthDays}天`,
         0, y, () => this.showPlantConfirm(p.type)
       );
       y -= 80;
@@ -1320,25 +1321,26 @@ export class Game {
     this.pendingPlantType = type;
     
     const popup = this.popupManager.show('PlantConfirm', {
-      title: `${config.emoji} ${config.name}`,
+      title: config.name,
       height: 0.75,
     });
     
     let y = 110;
     
-    this.popupManager.addLabel(`难度: ${'⭐'.repeat(config.difficulty)}`, 0, y, 28);
+    const stars = '★'.repeat(config.difficulty) + '☆'.repeat(5 - config.difficulty);
+    this.popupManager.addLabel(`难度: ${stars}`, 0, y, 28);
     y -= 42;
-    this.popupManager.addLabel(`📅 成熟周期: ${config.growthDays} 天`, 0, y, 28);
+    this.popupManager.addLabel(`成熟周期: ${config.growthDays} 天`, 0, y, 28);
     y -= 42;
-    this.popupManager.addLabel(`🌡️ 适宜温度: ${config.tempMin}°C ~ ${config.tempMax}°C`, 0, y, 26);
+    this.popupManager.addLabel(`适宜温度: ${config.tempMin}°C ~ ${config.tempMax}°C`, 0, y, 26);
     y -= 38;
-    this.popupManager.addLabel(`💧 适宜湿度: ${config.moistureMin}% ~ ${config.moistureMax}%`, 0, y, 26);
+    this.popupManager.addLabel(`适宜湿度: ${config.moistureMin}% ~ ${config.moistureMax}%`, 0, y, 26);
     y -= 50;
     
     this.popupManager.addLabel('— 选择游戏难度 —', 0, y, 22);
     y -= 50;
     
-    this.popupManager.addButton('🧘 佛系种植', 0, y, () => {
+    this.popupManager.addButton('佛系种植', 0, y, () => {
       this.pendingHardMode = false;
       this.doPlant();
       this.popupManager.close();
@@ -1346,7 +1348,7 @@ export class Game {
     this.popupManager.addLabel('显示数值提示', 0, y - 35, 20);
     y -= 80;
     
-    this.popupManager.addButton('🔥 硬核种植', 0, y, () => {
+    this.popupManager.addButton('硬核种植', 0, y, () => {
       this.pendingHardMode = true;
       this.doPlant();
       this.popupManager.close();
@@ -1359,7 +1361,7 @@ export class Game {
    */
   showRemoveConfirm() {
     const popup = this.popupManager.show('RemoveConfirm', {
-      title: '⚠️ 确认挖除',
+      title: '确认挖除',
       height: 0.32,
     });
     
@@ -1370,7 +1372,7 @@ export class Game {
       this.popupManager.close();
     }, 'danger');
     
-    this.popupManager.addButton('❌ 取消', 0, -100, () => {
+    this.popupManager.addButton('取消', 0, -100, () => {
       this.popupManager.close();
     }, 'secondary');
   }
@@ -1384,25 +1386,25 @@ export class Game {
     const plot = this.gameData.plots[this.selectedPlot];
     
     const popup = this.popupManager.show('FacilityMenu', {
-      title: '🏠 设施管理',
+      title: '设施管理',
       height: 0.55,
     });
     
-    const shelterText = plot.hasShelter ? '🏠 遮雨棚 ✅ (点击移除)' : '🏠 遮雨棚 (点击安装)';
+    const shelterText = plot.hasShelter ? '遮雨棚 [已安装]' : '遮雨棚 [点击安装]';
     this.popupManager.addButton(shelterText, 0, 60, () => {
       this.toggleShelter();
       this.popupManager.close();
     });
     this.popupManager.addLabel('阻挡风雨阳光，减少蒸发但影响生长', 0, 10, 20);
     
-    const dehumText = plot.hasDehumidifier ? '💨 除湿器 ✅ (点击移除)' : '💨 除湿器 (点击安装)';
+    const dehumText = plot.hasDehumidifier ? '除湿器 [已安装]' : '除湿器 [点击安装]';
     this.popupManager.addButton(dehumText, 0, -60, () => {
       this.toggleDehumidifier();
       this.popupManager.close();
     });
     this.popupManager.addLabel('每小时降低 2% 土壤湿度', 0, -110, 22);
     
-    this.popupManager.addButton('❌ 关闭', 0, -190, () => {
+    this.popupManager.addButton('关闭', 0, -190, () => {
       this.popupManager.close();
     }, 'secondary');
   }
