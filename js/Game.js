@@ -660,10 +660,13 @@ export class Game {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
-    // 标题
+    // 标题（用图标 + 文字）
     ctx.fillStyle = 'white';
     this.setFont(ctx, 32, true);
-    this.drawTextWithShadow(ctx, '🌱 我的小菜园', this.screenWidth / 2, this.topSafeArea + this.scaled(18));
+    const titleX = this.screenWidth / 2;
+    const titleY = this.topSafeArea + this.scaled(18);
+    this.drawIcon(ctx, 'seedling', titleX - this.scaled(85), titleY, this.scaled(28));
+    this.drawTextWithShadow(ctx, '我的小菜园', titleX + this.scaled(10), titleY);
     
     // 展开按钮
     this.setFont(ctx, 20);
@@ -686,19 +689,13 @@ export class Game {
       
       // 天气
       if (this.weather) {
-        const weatherText = this.getWeatherText();
-        this.drawTextWithShadow(ctx, weatherText, this.screenWidth / 2, y);
+        this.renderWeatherLine(ctx, this.screenWidth / 2, y);
         y += lineHeight;
       }
       
       // 土壤
       const isHardMode = plot.plant?.hardMode;
-      if (isHardMode) {
-        this.drawTextWithShadow(ctx, '💧 土壤: ???', this.screenWidth / 2, y);
-      } else {
-        const bar = this.getMoistureBar(plot.soilMoisture);
-        this.drawTextWithShadow(ctx, `💧 土壤: ${bar} ${plot.soilMoisture.toFixed(0)}%`, this.screenWidth / 2, y);
-      }
+      this.renderMoistureLine(ctx, this.screenWidth / 2, y, plot.soilMoisture, isHardMode);
       y += lineHeight;
       
       // 阶段
@@ -711,19 +708,18 @@ export class Game {
           this.drawTextWithShadow(ctx, `${config.name} · ${stage.name}`, this.screenWidth / 2, y);
         }
       } else {
-        this.drawTextWithShadow(ctx, '🌱 空地', this.screenWidth / 2, y);
+        // 空地 - 用图标
+        this.drawIcon(ctx, 'seedling', this.screenWidth / 2 - this.scaled(30), y, this.scaled(18));
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
+        ctx.fillText('空地', this.screenWidth / 2 - this.scaled(15), y);
+        ctx.textAlign = 'center';
       }
       y += lineHeight;
       
       // 状态
       if (plot.plant) {
-        if (isHardMode) {
-          this.drawTextWithShadow(ctx, '🔥 硬核模式', this.screenWidth / 2, y);
-        } else {
-          const healthEmoji = getHealthEmoji(plot.plant.healthState);
-          const progress = (plot.plant.growthProgress * 100).toFixed(0);
-          this.drawTextWithShadow(ctx, `${healthEmoji} ${plot.plant.healthValue.toFixed(0)}%  📈 ${progress}%`, this.screenWidth / 2, y);
-        }
+        this.renderHealthLine(ctx, this.screenWidth / 2, y, plot.plant, isHardMode);
       } else {
         this.drawTextWithShadow(ctx, '等待播种', this.screenWidth / 2, y);
       }
@@ -737,8 +733,8 @@ export class Game {
         : this.topSafeArea + this.scaled(48);
       this.setFont(ctx, 20);
       ctx.fillStyle = 'rgb(255, 220, 150)';
-      const tip = this.generateTip(plot);
-      this.drawTextWithShadow(ctx, tip, this.screenWidth / 2, tipY, 'rgb(255, 220, 150)');
+      const tipData = this.generateTip(plot);
+      this.renderTipLine(ctx, this.screenWidth / 2, tipY, tipData);
     }
     
     // 更新按钮状态
@@ -777,37 +773,168 @@ export class Game {
    * 获取天气文本
    */
   getWeatherText() {
-    if (!this.weather) return '🌤️ 加载中...';
+    if (!this.weather) return null;
     
     const temp = this.weather.temperature.toFixed(1);
     const sunPercent = Math.round(this.weather.sunlight * 100);
     const rain = this.weather.precipitation.toFixed(1);
     const wind = this.weather.windSpeed.toFixed(0);
     
-    let emoji = '☀️';
-    if (this.weather.precipitation > 5) emoji = '🌧️';
-    else if (this.weather.precipitation > 0) emoji = '🌦️';
-    else if (this.weather.sunlight > 0.8) emoji = '☀️';
-    else if (this.weather.sunlight > 0.5) emoji = '⛅';
-    else emoji = '☁️';
+    // 返回结构化数据
+    let mainIcon = 'sun';
+    if (this.weather.precipitation > 5) mainIcon = 'raindrop';
+    else if (this.weather.precipitation > 0) mainIcon = 'cloud';
+    else if (this.weather.sunlight > 0.8) mainIcon = 'sun';
+    else if (this.weather.sunlight > 0.5) mainIcon = 'cloud';
+    else mainIcon = 'cloud';
     
-    return `${emoji} ${temp}°C  ☀️${sunPercent}%  🌧️${rain}mm  🌬️${wind}km/h`;
+    return {
+      mainIcon,
+      temp: `${temp}°C`,
+      sunPercent: `${sunPercent}%`,
+      rain: `${rain}mm`,
+      wind: `${wind}km/h`,
+    };
   }
   
   /**
-   * 湿度条
+   * 绘制天气状态行
+   */
+  renderWeatherLine(ctx, x, y) {
+    const data = this.getWeatherData();
+    if (!data) {
+      this.drawTextWithShadow(ctx, '加载中...', x, y);
+      return;
+    }
+    
+    const iconSize = this.scaled(18);
+    const spacing = this.scaled(8);
+    let currentX = x - this.scaled(120);  // 从左侧开始
+    
+    // 主天气图标 + 温度
+    this.drawIcon(ctx, data.mainIcon, currentX, y, iconSize);
+    currentX += iconSize / 2 + spacing;
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
+    ctx.fillText(data.temp, currentX, y);
+    currentX += ctx.measureText(data.temp).width + spacing * 2;
+    
+    // 光照
+    this.drawIcon(ctx, 'sun', currentX, y, iconSize * 0.8);
+    currentX += iconSize / 2 + spacing / 2;
+    ctx.fillText(data.sunPercent, currentX, y);
+    currentX += ctx.measureText(data.sunPercent).width + spacing * 2;
+    
+    // 降雨
+    this.drawIcon(ctx, 'raindrop', currentX, y, iconSize * 0.8);
+    currentX += iconSize / 2 + spacing / 2;
+    ctx.fillText(data.rain, currentX, y);
+    currentX += ctx.measureText(data.rain).width + spacing * 2;
+    
+    // 风速
+    this.drawIcon(ctx, 'wind', currentX, y, iconSize * 0.8);
+    currentX += iconSize / 2 + spacing / 2;
+    ctx.fillText(data.wind, currentX, y);
+    
+    ctx.textAlign = 'center';
+  }
+  
+  /**
+   * 获取天气数据
+   */
+  getWeatherData() {
+    if (!this.weather) return null;
+    
+    const temp = this.weather.temperature.toFixed(1);
+    const sunPercent = Math.round(this.weather.sunlight * 100);
+    const rain = this.weather.precipitation.toFixed(1);
+    const wind = this.weather.windSpeed.toFixed(0);
+    
+    let mainIcon = 'sun';
+    if (this.weather.precipitation > 5) mainIcon = 'raindrop';
+    else if (this.weather.precipitation > 0) mainIcon = 'cloud';
+    else if (this.weather.sunlight > 0.8) mainIcon = 'sun';
+    else mainIcon = 'cloud';
+    
+    return {
+      mainIcon,
+      temp: `${temp}°C`,
+      sunPercent: `${sunPercent}%`,
+      rain: `${rain}mm`,
+      wind: `${wind}km/h`,
+    };
+  }
+  
+  /**
+   * 湿度条（用圆点代替 emoji）
    */
   getMoistureBar(moisture) {
     const filled = Math.round(moisture / 20);
-    return '💧'.repeat(Math.min(5, filled)) + '○'.repeat(Math.max(0, 5 - filled));
+    return '●'.repeat(Math.min(5, filled)) + '○'.repeat(Math.max(0, 5 - filled));
   }
   
   /**
-   * 生成智能提示
+   * 绘制土壤湿度行
+   */
+  renderMoistureLine(ctx, x, y, moisture, isHidden) {
+    const iconSize = this.scaled(18);
+    const spacing = this.scaled(6);
+    
+    // 水滴图标
+    this.drawIcon(ctx, 'raindrop', x - this.scaled(60), y, iconSize);
+    
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
+    if (isHidden) {
+      ctx.fillText('土壤: ???', x - this.scaled(45), y);
+    } else {
+      const bar = this.getMoistureBar(moisture);
+      ctx.fillText(`土壤: ${bar} ${moisture.toFixed(0)}%`, x - this.scaled(45), y);
+    }
+    ctx.textAlign = 'center';
+  }
+  
+  /**
+   * 绘制健康状态行
+   */
+  renderHealthLine(ctx, x, y, plant, isHidden) {
+    const iconSize = this.scaled(18);
+    
+    if (isHidden) {
+      // 硬核模式 - 火焰图标
+      this.drawIcon(ctx, 'fire', x - this.scaled(50), y, iconSize);
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'left';
+      ctx.fillText('硬核模式', x - this.scaled(35), y);
+      ctx.textAlign = 'center';
+      return;
+    }
+    
+    // 健康表情
+    let faceIcon = 'happy';
+    if (plant.healthState === HealthState.DEAD) faceIcon = 'skull';
+    else if (plant.healthState === HealthState.WILTING) faceIcon = 'sad';
+    else if (plant.healthState === HealthState.STRESSED) faceIcon = 'neutral';
+    
+    const progress = (plant.growthProgress * 100).toFixed(0);
+    
+    this.drawIcon(ctx, faceIcon, x - this.scaled(70), y, iconSize);
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${plant.healthValue.toFixed(0)}%`, x - this.scaled(55), y);
+    
+    // 进度图标（用叶子）
+    this.drawIcon(ctx, 'leaf', x + this.scaled(5), y, iconSize * 0.8);
+    ctx.fillText(`${progress}%`, x + this.scaled(20), y);
+    ctx.textAlign = 'center';
+  }
+  
+  /**
+   * 生成智能提示（返回 { icon, text } 结构）
    */
   generateTip(plot) {
     if (!plot.plant) {
-      return '💡 点击「种植」开始吧~';
+      return { icon: 'seedling', text: '点击「种植」开始吧~' };
     }
     
     const plant = plot.plant;
@@ -815,59 +942,81 @@ export class Game {
     const moisture = plot.soilMoisture;
     
     if (plant.healthState === HealthState.DEAD) {
-      return '💀 植物已枯死';
+      return { icon: 'skull', text: '植物已枯死' };
     }
     
     if (plant.growthProgress >= 1.0) {
-      return '🎉 可以收获了！';
+      return { icon: 'wheat', text: '可以收获了！' };
     }
     
     const problems = [];
     
     // 水分问题
     if (moisture < config.moistureMin) {
-      problems.push(config.moistureMin - moisture > 20 ? '🏜️ 严重干旱！' : '💧 土壤干燥');
+      problems.push({ icon: 'desert', text: config.moistureMin - moisture > 20 ? '严重干旱！' : '土壤干燥' });
     } else if (moisture > config.moistureMax) {
-      problems.push(moisture - config.moistureMax > 20 ? '🌊 水涝严重！' : '💦 土壤过湿');
+      problems.push({ icon: 'raindrop', text: moisture - config.moistureMax > 20 ? '水涝严重！' : '土壤过湿' });
     }
     
     // 温度问题
     if (this.weather) {
       const temp = this.weather.temperature;
       if (temp < config.tempMin) {
-        problems.push(config.tempMin - temp > 10 ? '🥶 严重低温！' : '❄️ 温度偏低');
+        problems.push({ icon: 'snowflake', text: config.tempMin - temp > 10 ? '严重低温！' : '温度偏低' });
       } else if (temp > config.tempMax) {
-        problems.push(temp - config.tempMax > 10 ? '🔥 严重高温！' : '☀️ 温度偏高');
+        problems.push({ icon: 'fire', text: temp - config.tempMax > 10 ? '严重高温！' : '温度偏高' });
       }
       
       // 光照问题
       if (this.weather.sunlight < config.sunlightMin) {
-        problems.push('🌑 光照不足');
+        problems.push({ icon: 'cloud', text: '光照不足' });
       } else if (this.weather.sunlight > config.sunlightMax) {
-        problems.push('☀️ 光照过强');
+        problems.push({ icon: 'sun', text: '光照过强' });
       }
     }
     
     // 健康状态
     if (plant.healthState === HealthState.WILTING) {
-      problems.push('🥀 正在枯萎');
+      problems.push({ icon: 'sad', text: '正在枯萎' });
     } else if (plant.healthState === HealthState.STRESSED) {
-      problems.push('😰 生长受阻');
+      problems.push({ icon: 'neutral', text: '生长受阻' });
     }
     
     if (problems.length > 0) {
-      return problems.join(' · ');
+      // 返回第一个问题（最重要的）
+      return problems[0];
     }
     
     // 正常状态
     const progress = Math.round(plant.growthProgress * 100);
-    if (progress < 5) return '🌱 种子刚刚播下~';
-    if (progress < 15) return '🌱 正在发芽，耐心等待~';
-    if (progress < 30) return '🌿 小苗在努力生长中~';
-    if (progress < 50) return '🪴 长势不错，继续保持~';
-    if (progress < 70) return '🌳 茁壮成长中~';
-    if (progress < 90) return '✨ 快要成熟了，再等等~';
-    return '🌸 即将成熟，准备收获吧！';
+    if (progress < 5) return { icon: 'seedling', text: '种子刚刚播下~' };
+    if (progress < 15) return { icon: 'seedling', text: '正在发芽，耐心等待~' };
+    if (progress < 30) return { icon: 'leaf', text: '小苗在努力生长中~' };
+    if (progress < 50) return { icon: 'leaf', text: '长势不错，继续保持~' };
+    if (progress < 70) return { icon: 'leaf', text: '茁壮成长中~' };
+    if (progress < 90) return { icon: 'wheat', text: '快要成熟了，再等等~' };
+    return { icon: 'wheat', text: '即将成熟，准备收获吧！' };
+  }
+  
+  /**
+   * 绘制智能提示行
+   */
+  renderTipLine(ctx, x, y, tipData) {
+    if (!tipData) return;
+    
+    const iconSize = this.scaled(18);
+    const textWidth = ctx.measureText(tipData.text).width;
+    const totalWidth = iconSize + this.scaled(6) + textWidth;
+    const startX = x - totalWidth / 2;
+    
+    // 绘制图标
+    this.drawIcon(ctx, tipData.icon, startX + iconSize / 2, y, iconSize);
+    
+    // 绘制文字
+    ctx.fillStyle = 'rgb(255, 220, 150)';
+    ctx.textAlign = 'left';
+    this.drawTextWithShadow(ctx, tipData.text, startX + iconSize + this.scaled(6), y, 'rgb(255, 220, 150)');
+    ctx.textAlign = 'center';
   }
   
   /**
