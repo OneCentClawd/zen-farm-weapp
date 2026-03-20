@@ -455,6 +455,13 @@ export class Game {
    * 触摸结束
    */
   onTouchEnd(e) {
+    // 防重入：同一帧内只处理一次
+    const now = Date.now();
+    if (this._lastTouchEnd && now - this._lastTouchEnd < 50) {
+      return;
+    }
+    this._lastTouchEnd = now;
+    
     // 兼容微信小游戏和浏览器
     if (e.preventDefault) e.preventDefault();
     const touch = e.changedTouches ? e.changedTouches[0] : e;
