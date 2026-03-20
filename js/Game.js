@@ -1177,11 +1177,18 @@ export class Game {
    * 点击种植按钮
    */
   onPlantTap() {
-    if (!this.gameData) return;
+    console.log('onPlantTap 被调用');
+    if (!this.gameData) {
+      console.log('没有 gameData');
+      return;
+    }
     const plot = this.gameData.plots[this.selectedPlot];
+    console.log('plot:', plot);
+    console.log('plot.plant:', plot?.plant);
     
     if (plot.plant) {
       if (plot.plant.healthState === HealthState.DEAD) {
+        console.log('植物已死亡，清除');
         // 清除死亡植物
         this.gameData.plots[this.selectedPlot] = {
           ...plot,
@@ -1191,10 +1198,12 @@ export class Game {
         saveGame(this.gameData);
       } else {
         // 显示挖除确认
+        console.log('显示挖除确认弹窗');
         this.showRemoveConfirm();
       }
     } else {
       // 显示种植选择
+      console.log('显示种植选择弹窗');
       this.showPlantSelect();
     }
   }
