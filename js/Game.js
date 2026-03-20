@@ -82,6 +82,11 @@ export class Game {
     
     // 顶部安全区
     this.topSafeArea = 0;
+    
+    // 头像相关
+    this.avatarImages = {};
+    this.avatarList = ['female1', 'female2', 'female3', 'male1', 'male2', 'male3'];
+    this.avatarBtn = null;
   }
   
   /**
@@ -102,6 +107,9 @@ export class Game {
     
     // 加载存档
     await this.initGameData();
+    
+    // 加载头像图片
+    await this.loadAvatarImages();
     
     // 获取天气
     await this.updateWeather();
@@ -238,6 +246,16 @@ export class Game {
       height: this.scaled(40),
       handler: () => this.toggleStatusBar(),
     };
+    
+    // 头像按钮（左下角）
+    const avatarSize = this.scaled(60);
+    const avatarMargin = this.scaled(15);
+    this.avatarBtn = {
+      x: avatarMargin,
+      y: this.screenHeight - avatarSize - avatarMargin - this.scaled(30),
+      width: avatarSize,
+      height: avatarSize,
+    };
   }
   
   /**
@@ -252,6 +270,11 @@ export class Game {
         this.gameData = this.createNewGameData();
       }
       
+      // 兼容旧存档：添加 avatar 字段
+      if (!this.gameData.avatar) {
+        this.gameData.avatar = 'female1';
+      }
+      
       console.log(`📂 地块数: ${this.gameData.plots.length}`);
       
       // 离线模拟：补算离线期间的生长
@@ -259,6 +282,25 @@ export class Game {
     } catch (e) {
       console.error('加载存档失败:', e);
       this.gameData = this.createNewGameData();
+    }
+  }
+  
+  /**
+   * 加载头像图片
+   */
+  async loadAvatarImages() {
+    for (const avatarId of this.avatarList) {
+      try {
+        const img = wx.createImage();
+        img.src = `images/avatars/${avatarId}.png`;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+        this.avatarImages[avatarId] = img;
+      } catch (e) {
+        console.warn(`头像加载失败: ${avatarId}`);
+      }
     }
   }
   
@@ -473,6 +515,13 @@ export class Game {
   handleTap(x, y) {
     console.log(`handleTap: x=${x}, y=${y}`);
     
+    // 检查头像点击
+    if (this.avatarBtn && this.isInButton(x, y, this.avatarBtn)) {
+      console.log('点击了头像');
+      this.showAvatarSelector();
+      return;
+    }
+    
     // 检查展开按钮
     if (this.isInButton(x, y, this.expandBtn)) {
       console.log('点击了展开按钮');
@@ -657,6 +706,9 @@ export class Game {
     
     // 渲染 UI
     this.renderUI(ctx);
+    
+    // 渲染头像
+    this.renderAvatar(ctx);
     
     // 渲染弹窗
     if (this.popupManager) {
@@ -1096,6 +1148,62 @@ export class Game {
       ctx.fillStyle = 'white';
       ctx.fillText(btn.text, iconX + iconSize / 2 + this.scaled(5), btn.y + btn.height / 2 + 6);
     }
+  }
+  
+  /**
+   * 渲染头像
+   */
+  renderAvatar(ctx) {
+    if (!this.gameData || !this.avatarBtn) return;
+    
+    const avatarId = this.gameData.avatar || 'female1';
+    const avatarImg = this.avatarImages[avatarId];
+    if (!avatarImg) return;
+    
+    const { x, y, width, height } = this.avatarBtn;
+    
+    // 绘制背景
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.beginPath();
+    ctx.roundRect(x - 5, y - 5, width + 10, height + 10, 10);
+    ctx.fill();
+    
+    // 绘制头像
+    ctx.drawImage(avatarImg, x, y, width, height);
+    ctx.restore();
+  }
+  
+  /**
+   * 显示头像选择器
+   */
+  showAvatarSelector() {
+    this.popupManager.show('avatar', {
+      title: '选择形象',
+      width: 0.85,
+      height: 0.45,
+    });
+    
+    // 选项按钮
+    this.popupManager.addOption('女1', -70, 30, () => this.selectAvatar('female1'));
+    this.popupManager.addOption('女2', 0, 30, () => this.selectAvatar('female2'));
+    this.popupManager.addOption('女3', 70, 30, () => this.selectAvatar('female3'));
+    
+    this.popupManager.addOption('男1', -70, -20, () => this.selectAvatar('male1'));
+    this.popupManager.addOption('男2', 0, -20, () => this.selectAvatar('male2'));
+    this.popupManager.addOption('男3', 70, -20, () => this.selectAvatar('male3'));
+    
+    this.popupManager.addButton('关闭', 0, -70, () => this.popupManager.close(), 'secondary');
+  }
+  
+  /**
+   * 选择头像
+   */
+  selectAvatar(avatarId) {
+    if (!this.gameData) return;
+    this.gameData.avatar = avatarId;
+    saveGame(this.gameData);
+    this.popupManager.close();
   }
   
   /**
