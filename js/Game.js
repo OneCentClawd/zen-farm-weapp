@@ -471,25 +471,33 @@ export class Game {
    * 处理点击
    */
   handleTap(x, y) {
+    console.log(`handleTap: x=${x}, y=${y}`);
+    
     // 检查展开按钮
     if (this.isInButton(x, y, this.expandBtn)) {
+      console.log('点击了展开按钮');
       this.expandBtn.handler();
       return;
     }
     
     // 检查地块切换按钮
     if (this.plotSwitchBtn.visible && this.isInButton(x, y, this.plotSwitchBtn)) {
+      console.log('点击了地块切换');
       this.plotSwitchBtn.handler();
       return;
     }
     
     // 检查操作按钮
     for (const btn of this.buttons) {
+      console.log(`按钮 ${btn.id}: x=${btn.x.toFixed(0)}-${(btn.x+btn.width).toFixed(0)}, y=${btn.y.toFixed(0)}-${(btn.y+btn.height).toFixed(0)}, visible=${btn.visible}`);
       if (btn.visible !== false && this.isInButton(x, y, btn)) {
+        console.log(`点击了按钮: ${btn.id}`);
         btn.handler();
         return;
       }
     }
+    
+    console.log('没有命中任何按钮');
   }
   
   /**
