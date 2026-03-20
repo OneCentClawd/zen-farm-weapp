@@ -1162,11 +1162,22 @@ export class Game {
     
     const { x, y, width, height } = this.avatarBtn;
     
-    // 绘制背景
+    // 绘制背景（手动圆角矩形）
     ctx.save();
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    const r = 10;
+    const bx = x - 5, by = y - 5, bw = width + 10, bh = height + 10;
     ctx.beginPath();
-    ctx.roundRect(x - 5, y - 5, width + 10, height + 10, 10);
+    ctx.moveTo(bx + r, by);
+    ctx.lineTo(bx + bw - r, by);
+    ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+    ctx.lineTo(bx + bw, by + bh - r);
+    ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
+    ctx.lineTo(bx + r, by + bh);
+    ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
+    ctx.lineTo(bx, by + r);
+    ctx.quadraticCurveTo(bx, by, bx + r, by);
+    ctx.closePath();
     ctx.fill();
     
     // 绘制头像
