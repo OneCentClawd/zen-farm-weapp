@@ -289,19 +289,27 @@ export class Game {
    * 加载头像图片
    */
   async loadAvatarImages() {
+    console.log('开始加载头像图片');
     for (const avatarId of this.avatarList) {
       try {
         const img = wx.createImage();
         img.src = `images/avatars/${avatarId}.png`;
         await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
+          img.onload = () => {
+            console.log(`头像加载成功: ${avatarId}`);
+            resolve();
+          };
+          img.onerror = (e) => {
+            console.error(`头像加载失败: ${avatarId}`, e);
+            reject(e);
+          };
         });
         this.avatarImages[avatarId] = img;
       } catch (e) {
-        console.warn(`头像加载失败: ${avatarId}`);
+        console.warn(`头像加载失败: ${avatarId}`, e);
       }
     }
+    console.log('头像加载完成，已加载:', Object.keys(this.avatarImages));
   }
   
   /**
