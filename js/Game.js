@@ -167,7 +167,7 @@ export class Game {
    */
   initButtons() {
     const btnX = this.screenWidth - this.scaled(60);
-    let btnY = this.topSafeArea + this.scaled(80);
+    let btnY = this.topSafeArea + this.scaled(130);
     const btnGap = this.scaled(38);
     const btnW = this.scaled(100);
     const btnH = this.scaled(35);
