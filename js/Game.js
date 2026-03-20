@@ -362,11 +362,21 @@ export class Game {
    * 绑定事件
    */
   bindEvents() {
+    // 微信小游戏全局触摸事件（真机用这个）
+    if (typeof wx !== 'undefined' && wx.onTouchStart) {
+      wx.onTouchStart((e) => {
+        this.onTouchStart({ touches: e.touches, changedTouches: e.changedTouches });
+      });
+      wx.onTouchEnd((e) => {
+        this.onTouchEnd({ touches: e.touches, changedTouches: e.changedTouches });
+      });
+    }
+    
+    // Canvas 触摸事件（模拟器备用）
     this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e));
     this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e));
-    this.canvas.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
     
-    // 鼠标事件（开发调试用）
+    // 鼠标事件（模拟器调试用）
     this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
   }
@@ -375,11 +385,12 @@ export class Game {
    * 触摸开始
    */
   onTouchStart(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
+    // 兼容微信小游戏和浏览器
+    if (e.preventDefault) e.preventDefault();
+    const touch = e.touches ? e.touches[0] : e;
     // 微信小游戏直接用 clientX/clientY，就是逻辑像素坐标
-    const x = touch.clientX;
-    const y = touch.clientY;
+    const x = touch.clientX || touch.x || 0;
+    const y = touch.clientY || touch.y || 0;
     
     this.touchStartX = x;
     this.touchStartY = y;
@@ -394,11 +405,12 @@ export class Game {
    * 触摸结束
    */
   onTouchEnd(e) {
-    e.preventDefault();
-    const touch = e.changedTouches[0];
+    // 兼容微信小游戏和浏览器
+    if (e.preventDefault) e.preventDefault();
+    const touch = e.changedTouches ? e.changedTouches[0] : e;
     // 微信小游戏直接用 clientX/clientY
-    const x = touch.clientX;
-    const y = touch.clientY;
+    const x = touch.clientX || touch.x || 0;
+    const y = touch.clientY || touch.y || 0;
     
     // 弹窗优先处理
     if (this.popupManager.isShowing()) {
