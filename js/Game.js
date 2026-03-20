@@ -412,7 +412,7 @@ export class Game {
    * 绑定事件
    */
   bindEvents() {
-    // 微信小游戏全局触摸事件（真机用这个）
+    // 微信小游戏全局触摸事件
     if (typeof wx !== 'undefined' && wx.onTouchStart) {
       wx.onTouchStart((e) => {
         this.onTouchStart({ touches: e.touches, changedTouches: e.changedTouches });
@@ -421,10 +421,6 @@ export class Game {
         this.onTouchEnd({ touches: e.touches, changedTouches: e.changedTouches });
       });
     }
-    
-    // Canvas 触摸事件（模拟器备用）
-    this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e));
-    this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e));
     
     // 鼠标事件（模拟器调试用）
     this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
@@ -455,13 +451,6 @@ export class Game {
    * 触摸结束
    */
   onTouchEnd(e) {
-    // 防重入：同一帧内只处理一次
-    const now = Date.now();
-    if (this._lastTouchEnd && now - this._lastTouchEnd < 50) {
-      return;
-    }
-    this._lastTouchEnd = now;
-    
     // 兼容微信小游戏和浏览器
     if (e.preventDefault) e.preventDefault();
     const touch = e.changedTouches ? e.changedTouches[0] : e;
