@@ -174,14 +174,14 @@ export class Game {
     
     this.buttons = [
       {
-        id: 'facility',
-        text: '设施',
-        icon: 'house',
+        id: 'action',
+        text: '种植',
+        icon: 'seedling',
         x: btnX - btnW / 2,
         y: btnY - btnH / 2,
         width: btnW,
         height: btnH,
-        handler: () => this.showFacilityMenu(),
+        handler: () => this.onPlantTap(),
       },
       {
         id: 'water',
@@ -194,14 +194,14 @@ export class Game {
         handler: () => this.onWaterTap(),
       },
       {
-        id: 'action',
-        text: '种植',
-        icon: 'seedling',
+        id: 'facility',
+        text: '设施',
+        icon: 'house',
         x: btnX - btnW / 2,
         y: btnY + btnGap * 2 - btnH / 2,
         width: btnW,
         height: btnH,
-        handler: () => this.onPlantTap(),
+        handler: () => this.showFacilityMenu(),
       },
       {
         id: 'harvest',
